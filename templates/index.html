@@ -1,1 +1,36 @@
-#placeholder
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách</title>
+</head>
+<body>
+    <h1>Danh sách dữ liệu</h1>
+    <table border="1">
+        <tr>
+            <th>STT</th>
+            <th>Ngày</th>
+            <th>Loại giao dịch</th>
+            <th>Nguồn tiền</th>
+            <th>Nơi đến</th>
+            <th>Số tiền</th>
+            <th>Ghi chú</th>
+            <th>Danh mục</th>
+
+        </tr>
+        {% for row in data %}
+        <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.ngay }}</td>
+            <td>{{ row.loai_giao_dich }}</td>
+            <td>{{ row.nguon_tien }}</td>
+            <td>{{ row.noi_den }}</td>
+            <td>{{ row.so_tien }}</td>
+            <td>{{ row.ghi_chu }}</td>
+            <td>{{ row.danh_mucmuc }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
