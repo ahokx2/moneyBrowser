@@ -1,36 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh sách</title>
+    <title>Text Command Web App</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #f0f0f0;
+            font-family: monospace;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 60px; /* Để tạo khoảng trống cho input fixed */
+            box-sizing: border-box; /* Đảm bảo padding không làm tăng chiều cao body */
+            font-size: 14px;
+        }
+        #output {
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1;
+            white-space: pre-wrap;
+            overflow-y: auto; /* Thêm scrollbar nếu output quá dài */
+            max-height: calc(100vh - 100px); /* Giới hạn chiều cao output */
+        }
+        .command {
+            color: #ddd;
+        }
+        .result {
+            color: #98c379;
+        }
+        #command-line-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #333; /* Để có nền cho input */
+            padding: 10px 20px; /* Thêm padding cho đẹp */
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        #command-line {
+            width: 100%;
+            padding: 10px;
+            background-color: transparent; /* Làm cho nền input trong suốt */
+            color: #f0f0f0;
+            border: none;
+            font-family: monospace;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none; /* Loại bỏ viền focus mặc định */
+        }
+    </style>
 </head>
 <body>
-    <h1>Danh sách dữ liệu</h1>
-    <table border="1">
-        <tr>
-            <th>STT</th>
-            <th>Ngày</th>
-            <th>Loại giao dịch</th>
-            <th>Nguồn tiền</th>
-            <th>Nơi đến</th>
-            <th>Số tiền</th>
-            <th>Ghi chú</th>
-            <th>Danh mục</th>
+    <div id="output"></div>
+    <div id="command-line-container">
+        <input type="text" id="command-line" placeholder="Nhập lệnh...">
+    </div>
 
-        </tr>
-        {% for row in data %}
-        <tr>
-            <td>{{ row.id }}</td>
-            <td>{{ row.ngay }}</td>
-            <td>{{ row.loai_giao_dich }}</td>
-            <td>{{ row.nguon_tien }}</td>
-            <td>{{ row.noi_den }}</td>
-            <td>{{ row.so_tien }}</td>
-            <td>{{ row.ghi_chu }}</td>
-            <td>{{ row.danh_mucmuc }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <script>
+        const commandLine = document.getElementById('command-line');
+        const outputDiv = document.getElementById('output');
+        const maxLines = 100; // Ví dụ: giữ tối đa 100 dòng
+
+        commandLine.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const command = commandLine.value;
+                commandLine.value = '';
+
+                const commandElement = document.createElement('p');
+                commandElement.classList.add('command');
+                commandElement.textContent = '> ' + command;
+                outputDiv.appendChild(commandElement);
+
+                fetch('/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ command: command })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.clear_output) {
+                        outputDiv.innerHTML = ''; // Xóa toàn bộ output
+                    } else {
+                        const resultElement = document.createElement('p');
+                        resultElement.classList.add('result');
+                        resultElement.textContent = data.result;
+                        outputDiv.appendChild(resultElement);
+                        if (outputDiv.children.length > maxLines) {
+                            outputDiv.removeChild(outputDiv.firstChild); // Xóa phần tử con đầu tiên (dòng cũ nhất)
+                        }
+                    }
+                    outputDiv.scrollTop = outputDiv.scrollHeight; // Tự động scroll xuống cuối output
+                })
+                .catch(error => {
+                    const errorElement = document.createElement('p');
+                    errorElement.classList.add('result');
+                    errorElement.textContent = 'Lỗi: ' + error;
+                    outputDiv.appendChild(errorElement);
+                    outputDiv.scrollTop = outputDiv.scrollHeight;
+                });
+            }
+        });
+    </script>
 </body>
 </html>
