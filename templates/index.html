@@ -1,107 +1,91 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Text Command Web App</title>
-    <style>
-        body {
-            background-color: #000;
-            color: #f0f0f0;
-            font-family: monospace;
-            margin: 0;
-            padding: 20px;
-            padding-bottom: 60px; /* Để tạo khoảng trống cho input fixed */
-            box-sizing: border-box; /* Đảm bảo padding không làm tăng chiều cao body */
-            font-size: 14px;
-        }
-        #output {
-            margin-top: 10px;
-            font-size: 14px;
-            line-height: 1;
-            white-space: pre-wrap;
-            overflow-y: auto; /* Thêm scrollbar nếu output quá dài */
-            max-height: calc(100vh - 100px); /* Giới hạn chiều cao output */
-        }
-        .command {
-            color: #ddd;
-        }
-        .result {
-            color: #98c379;
-        }
-        #command-line-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #333; /* Để có nền cho input */
-            padding: 10px 20px; /* Thêm padding cho đẹp */
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-        #command-line {
-            width: 100%;
-            padding: 10px;
-            background-color: transparent; /* Làm cho nền input trong suốt */
-            color: #f0f0f0;
-            border: none;
-            font-family: monospace;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none; /* Loại bỏ viền focus mặc định */
-        }
-    </style>
-</head>
-<body>
-    <div id="output"></div>
-    <div id="command-line-container">
-        <input type="text" id="command-line" placeholder="Nhập lệnh...">
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Thẻ tổng quan (Số dư, Thu nhập, Chi tiêu) -->
+<div class="max-w-md mx-auto mb-4">
+    <div class="bg-white p-4 shadow-md rounded-lg">
+        <h2 class="text-center font-semibold text-xl mb-4 border-b-2 border-gray-300 pb-2">Tổng quan tài chính</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="text-center">
+                <p class="text-sm text-gray-500">Số dư</p>
+                <p class="text-xl font-bold text-green-500">10,000,000₫</p>
+            </div>
+            <div class="text-center">
+                <p class="text-sm text-gray-500">Thu nhập</p>
+                <p class="text-xl font-bold text-blue-500">5,000,000₫</p>
+            </div>
+            <div class="text-center">
+                <p class="text-sm text-gray-500">Chi tiêu</p>
+                <p class="text-xl font-bold text-red-500">3,000,000₫</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thẻ biểu đồ -->
+<div class="max-w-md mx-auto mb-4">
+    <div class="bg-white p-4 shadow-md rounded-lg" style="height: 200px;">
+        <h2 class="text-center font-semibold text-xl mb-4 border-b-2 border-gray-300 pb-2">Biểu đồ tài chính</h2>
+        <canvas id="financialChart"></canvas>
+    </div>
+</div>
+
+<!-- Thẻ giao dịch hôm nay -->
+<div class="max-w-md mx-auto">
+    <div class="bg-white p-4 shadow-md rounded-lg">
+        <h2 class="text-center font-semibold text-xl mb-4 border-b-2 border-gray-300 pb-2">Giao dịch hôm nay</h2>
+        <ul class="space-y-2">
+            <li class="flex justify-between">
+                <span class="text-gray-500">Chi tiêu cho ăn uống</span>
+                <span class="font-bold text-red-500">-500,000₫</span>
+            </li>
+            <li class="flex justify-between">
+                <span class="text-gray-500">Thu nhập từ công việc</span>
+                <span class="font-bold text-blue-500">+1,000,000₫</span>
+            </li>
+            <li class="flex justify-between">
+                <span class="text-gray-500">Chi tiêu mua sắm</span>
+                <span class="font-bold text-red-500">-200,000₫</span>
+            </li>
+        </ul>
+        <button id="addTransactionBtn" class="mt-4 w-full sm:w-auto bg-blue-500 text-white py-1 px-3 rounded-md text-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+            Thêm giao dịch
+        </button>
     </div>
 
-    <script>
-        const commandLine = document.getElementById('command-line');
-        const outputDiv = document.getElementById('output');
-        const maxLines = 100; // Ví dụ: giữ tối đa 100 dòng
+    <!-- Nút Thêm Giao Dịch
+    <div class="max-w-md mx-auto mb-4">
+        <button id="addTransactionBtn" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+            Thêm giao dịch
+        </button>
+    </div> -->
 
-        commandLine.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                const command = commandLine.value;
-                commandLine.value = '';
+    <!-- Modal Thêm Giao Dịch -->
+    <div id="addTransactionModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg w-3/4 sm:w-1/2">
+            <h2 class="text-xl font-semibold mb-4">Thêm Giao Dịch</h2>
+            <form>
+                <!-- Chi tiết form sẽ thêm sau -->
+                <div class="mb-4">
+                    <label for="transactionAmount" class="block text-sm text-gray-700">Số tiền</label>
+                    <input type="number" id="transactionAmount" class="w-full px-4 py-2 border border-gray-300 rounded-md" placeholder="Nhập số tiền">
+                </div>
+                <div class="mb-4">
+                    <label for="transactionType" class="block text-sm text-gray-700">Loại giao dịch</label>
+                    <select id="transactionType" class="w-full px-4 py-2 border border-gray-300 rounded-md">
+                        <option value="income">Thu nhập</option>
+                        <option value="expense">Chi tiêu</option>
+                    </select>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="closeModalBtn" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2">Đóng</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Lưu giao dịch</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                const commandElement = document.createElement('p');
-                commandElement.classList.add('command');
-                commandElement.textContent = '> ' + command;
-                outputDiv.appendChild(commandElement);
-
-                fetch('/execute', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ command: command })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.clear_output) {
-                        outputDiv.innerHTML = ''; // Xóa toàn bộ output
-                    } else {
-                        const resultElement = document.createElement('p');
-                        resultElement.classList.add('result');
-                        resultElement.textContent = data.result;
-                        outputDiv.appendChild(resultElement);
-                        if (outputDiv.children.length > maxLines) {
-                            outputDiv.removeChild(outputDiv.firstChild); // Xóa phần tử con đầu tiên (dòng cũ nhất)
-                        }
-                    }
-                    outputDiv.scrollTop = outputDiv.scrollHeight; // Tự động scroll xuống cuối output
-                })
-                .catch(error => {
-                    const errorElement = document.createElement('p');
-                    errorElement.classList.add('result');
-                    errorElement.textContent = 'Lỗi: ' + error;
-                    outputDiv.appendChild(errorElement);
-                    outputDiv.scrollTop = outputDiv.scrollHeight;
-                });
-            }
-        });
-    </script>
-</body>
-</html>
+</div>
+<script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %}
