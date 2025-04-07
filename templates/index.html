@@ -51,7 +51,7 @@
         <p class="font-semibold">Tất cả giao dịch:</p>
         <ul class="pl-4 list-disc">
             {% for gd in giao_dich_all %}
-                <li>{{ gd.id }}: {{ gd.ngay }} – {{ gd.loai_giao_dich }} -  {{ gd.nguon_tien }} - {{ gd.noi_den }}  - {{ gd.so_tien | int | format }}₫ - {{ gd.ghi_chu }} - {{ gd.danh_muc }}</li>
+                <li>{{ gd.id }}: {{ gd.ngay }} – {{ gd.loai_giao_dich }} -  {{ gd.nguon_tien_obj.ten_nguon }} - {{ gd.noi_den_obj.ten_nguon }}  - {{ gd.so_tien | int | format }}₫ - {{ gd.ghi_chu }} - {{ gd.danh_muc_obj.ten_danh_muc }}</li>
             {% endfor %}
         </ul>
     </div>
