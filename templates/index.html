@@ -14,44 +14,22 @@
 
     <!-- Tổng quan tài chính -->
     <div class="mb-4">
-        <p class="font-semibold text-gray-700 border-b pb-1 mb-2">Tổng quan tài chính:</p>
+        <p class="font-semibold text-gray-700 border-b pb-1 mb-2">Tổng quan tài chính theo tháng : {{ thang_hien_tai }}</p>
         <ul class="pl-4 list-disc">
-            <li>Ngân hàng: {{ tong_quan.ngan_hang | int | format }}₫</li>
-            <li>Tiền mặt: {{ tong_quan.tien_mat | int | format }}₫</li>
-            <li>Gửi tiết kiệm: {{ tong_quan.gui_tiet_kiem | int | format }}₫</li>
-        </ul>
-    </div>
-
-    <hr class="my-4 border-gray-300">
-
-    <!-- Giao dịch hôm nay -->
-    <div class="mb-4">
-        <p class="font-semibold">Giao dịch hôm nay ({{ today }}):</p>
-        <ul class="pl-4 list-disc">
-            {% for gd in giao_dich_hom_nay %}
-                <li>{{ gd.loai }}: {{ gd.mo_ta }} – {{ gd.so_tien | int | format }}₫</li>
+            {% for gd in tong_hop_giao_dich_thang_hien_tai %}
+                <li>{{ gd.ten_nguon }}: {{ gd.dau_ky | float | format }} – {{ gd.thu | float | format }} -  {{ gd.chi | float | format }} - {{ gd.chuyen_doi | float | format }} - {{ gd.cuoi_ky | float | format }}</li>
             {% endfor %}
         </ul>
-    </div>
 
-    <hr class="my-4 border-gray-300">
-
-    <!-- Thống kê tháng này -->
-    <div>
-        <p class="font-semibold">Thống kê tháng này:</p>
-        <ul class="pl-4 list-disc">
-            <li>Thu: {{ thong_ke_thang.thu | int | format }}₫</li>
-            <li>Chi: {{ thong_ke_thang.chi | int | format }}₫</li>
-        </ul>
     </div>
 
     <hr class="my-4 border-gray-300">
     <!-- tất cả giao dịch -->
     <div>
-        <p class="font-semibold">Tất cả giao dịch:</p>
+        <p class="font-semibold">Tất cả giao dịch hôm nay: </p>
         <ul class="pl-4 list-disc">
-            {% for gd in giao_dich_all %}
-                <li>{{ gd.id }}: {{ gd.ngay }} – {{ gd.loai_giao_dich }} -  {{ gd.nguon_tien_obj.ten_nguon }} - {{ gd.noi_den_obj.ten_nguon }}  - {{ gd.so_tien | int | format }}₫ - {{ gd.ghi_chu }} - {{ gd.danh_muc_obj.ten_danh_muc }}</li>
+            {% for gd in giao_dich_hom_nay %}
+                <li>{{ gd.id }}: {{ gd.ngay }} – {{ gd.loai_giao_dich }} -  {{ gd.nguon_tien_obj.ten_nguon }} - {{ gd.noi_den_obj.ten_nguon }}  - {{ gd.so_tien | float | format }}₫ - {{ gd.ghi_chu }} - {{ gd.danh_muc_obj.ten_danh_muc }}</li>
             {% endfor %}
         </ul>
     </div>
