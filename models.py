@@ -33,3 +33,14 @@ class tblnguonnoiden(db.Model):
     ten_nguon = db.Column(db.String(100), nullable=True)
     loai_tai_san = db.Column(db.String(100), nullable=True)
     ghi_chu = db.Column(db.String(100), nullable=True)
+
+class vtonghopgiaodich(db.Model):
+    __tablename__ = 'vtonghopgiaodich'    
+    thang = db.Column(db.String(100), primary_key=True)
+    nguon_tien = db.Column(db.String(100), primary_key=True)
+    ten_nguon = db.Column(db.String(100))
+    dau_ky = db.Column(db.Float)
+    thu = db.Column(db.Float)
+    chi = db.Column(db.Float)
+    chuyen_doi = db.Column(db.Float)
+    cuoi_ky = db.Column(db.Float)
