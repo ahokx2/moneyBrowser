@@ -6,18 +6,91 @@
     <div class="flex justify-between items-center mb-4">
         <h1 class="font-bold text-base">Báo cáo tài chính</h1>
         <div class="flex gap-2">
-            <button class="text-blue-500 underline text-sm">+ Thêm giao dịch</button>
+            <!-- <button class="text-blue-500 underline text-sm">+ Thêm giao dịch</button> -->
+            <button onclick="document.getElementById('modalForm').classList.remove('hidden')" class="text-blue-500 underline text-sm">
+                + Thêm giao dịch
+            </button>
+
             <button class="text-gray-500 underline text-sm">◀ Tháng trước</button>
             <button class="text-gray-500 underline text-sm">🔍 Giao dịch lớn</button>
         </div>
     </div>
 
+    <!-- Modal -->
+    <div id="modalForm" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+            <h2 class="text-base font-semibold mb-4">Thêm giao dịch mới</h2>
+    
+            <form method="POST" action="/them_giao_dich" class="space-y-3">
+                <div>
+                    <!-- <label class="block text-sm mb-1">Ngày</label>
+                    <input name="ngay" type="text" value="{{ today.strftime('%d/%m/%Y') }}" class="w-full border rounded px-2 py-1" required> -->
+                    <label for="ngay" class="block mb-1 text-gray-700">Ngày:</label>
+                    <input type="date" id="ngay_input" class="w-full border rounded p-2 text-sm" required>
+                    <input type="hidden" name="ngay" id="ngay_hidden">
+                </div>
+        
+                <div>
+                <label class="block text-sm mb-1">Loại giao dịch</label>
+                <select name="loai_giao_dich" class="w-full border rounded px-2 py-1" required>
+                    <option value="Thu">Thu</option>
+                    <option value="Chi">Chi</option>
+                    <option value="Chuyển đổi">Chuyển đổi</option>
+                </select>
+                </div>
+        
+                <div>
+                    <label class="block text-sm mb-1">Nguồn tiền</label>
+                    <select name="nguon_tien" class="w-full border rounded px-2 py-1" required>
+                    {% for nguon in danh_sach_nguon %}
+                        <option value="{{ nguon.ma_nguon }}">{{ nguon.ten_nguon }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+        
+                <div>
+                    <label class="block text-sm mb-1">Nơi đến</label>
+                    <select name="noi_den" class="w-full border rounded px-2 py-1">
+                    <option value="">-- Không có --</option>
+                    {% for nguon in danh_sach_nguon %}
+                        <option value="{{ nguon.ma_nguon }}">{{ nguon.ten_nguon }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+        
+                <div>
+                    <label class="block text-sm mb-1">Số tiền</label>
+                    <input name="so_tien" type="number" step="1000" class="w-full border rounded px-2 py-1" required>
+                </div>
+        
+                <div>
+                    <label class="block text-sm mb-1">Ghi chú</label>
+                    <input name="ghi_chu" type="text" class="w-full border rounded px-2 py-1">
+                </div>
+        
+                <div>
+                    <label class="block text-sm mb-1">Danh mục</label>
+                    <select name="danh_muc" class="w-full border rounded px-2 py-1">
+                        <option value="">-- Không có --</option>
+                    {% for dm in danh_sach_danh_muc %}
+                        <option value="{{ dm.ma_danh_muc }}">{{ dm.ten_danh_muc }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+        
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="document.getElementById('modalForm').classList.add('hidden')" class="text-sm text-gray-500 underline">Hủy</button>
+                    <button type="submit" class="text-sm bg-blue-500 text-white px-3 py-1 rounded">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <!-- Tổng quan tài chính -->
     <div class="mb-4">
-        <p class="font-semibold text-gray-700 border-b pb-1 mb-2">Tổng quan tài chính theo tháng : {{ thang_hien_tai }}</p>
+        <p class="font-semibold text-gray-700 border-b pb-1 mb-2">Tổng quan tài chính tháng : {{ thang_hien_tai }}</p>
         <ul class="pl-4 list-disc">
             {% for gd in tong_hop_giao_dich_thang_hien_tai %}
-                <li>{{ gd.ten_nguon }}: {{ gd.dau_ky | float | format }} – {{ gd.thu | float | format }} -  {{ gd.chi | float | format }} - {{ gd.chuyen_doi | float | format }} - {{ gd.cuoi_ky | float | format }}</li>
+                <li>{{ gd.ten_nguon }}: {{ gd.dau_ky | format_tien }} – {{ gd.thu | format_tien }} -  {{ gd.chi | format_tien }} - {{ gd.chuyen_doi | format_tien }} - {{ gd.cuoi_ky | format_tien }}</li>
             {% endfor %}
         </ul>
 
@@ -26,12 +99,23 @@
     <hr class="my-4 border-gray-300">
     <!-- tất cả giao dịch -->
     <div>
-        <p class="font-semibold">Tất cả giao dịch hôm nay: </p>
+        <p class="font-semibold">Tất cả giao dịch hôm nay: {{ today.strftime('%d/%m/%Y') }}</p>
         <ul class="pl-4 list-disc">
             {% for gd in giao_dich_hom_nay %}
-                <li>{{ gd.id }}: {{ gd.ngay }} – {{ gd.loai_giao_dich }} -  {{ gd.nguon_tien_obj.ten_nguon }} - {{ gd.noi_den_obj.ten_nguon }}  - {{ gd.so_tien | float | format }}₫ - {{ gd.ghi_chu }} - {{ gd.danh_muc_obj.ten_danh_muc }}</li>
+                <li>{{ gd.id }}: {{ gd.ngay }} – {{ gd.loai_giao_dich }} -  {{ gd.nguon_tien_obj.ten_nguon }} - {{ gd.noi_den_obj.ten_nguon }}  - {{ gd.so_tien | format_tien }}₫ - {{ gd.ghi_chu }} - {{ gd.danh_muc_obj.ten_danh_muc }}</li>
             {% endfor %}
         </ul>
     </div>
+
+    <script>
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const dateInput = document.getElementById("ngay_input").value;
+            if (dateInput) {
+                const parts = dateInput.split("-");
+                const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;  // dd/mm/yyyy
+                document.getElementById("ngay_hidden").value = formattedDate;
+            }
+        });
+    </script>
 </body>
 {% endblock %}
