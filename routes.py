@@ -1,8 +1,8 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 from datetime import date
-from db_utils import get_giao_dich_hom_nay, get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai
-from models import db
+from db_utils import get_giao_dich_hom_nay, get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi
+from models import db, tblnguonnoiden, tbldanhmuc
 
 app = Flask(__name__)
 
@@ -14,9 +14,35 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
-hom_nay = date.today()
+
+hom_nay = date.today()  # format tùy theo bạn lưu
 thang_hien_tai = hom_nay.strftime('%m/%Y')
 
+@app.template_filter('format_tien')
+def format_tien(value):
+    """
+    Định dạng số tiền với dấu phẩy và ký hiệu tiền tệ.
+    :param value: Giá trị số tiền
+    :return: Chuỗi định dạng tiền tệ
+    """
+    try:
+        value = float(value)
+        if value.is_integer():
+            return f"{int(value):,}".replace(",", ".")  # 75000000 → 75.000.000
+        else:
+            return f"{value:,.2f}".replace(",", ".").replace(".", ",", 1)  # nếu có phần thập phân
+    except:
+        return value
+
+@app.route("/them_giao_dich", methods=["POST"])
+def them_giao_dich():
+    data = request.form.to_dict()
+    success = add_giao_dich_moi(data)
+    if success:
+        return redirect("/")  # hoặc redirect(url_for('index'))
+    else:
+        return "Lỗi khi thêm giao dịch", 500
+    
 @app.route("/")
 def index():
     giao_dich_hom_nay = get_giao_dich_hom_nay()
@@ -24,6 +50,8 @@ def index():
     tong_hop_giao_dich = get_tong_hop_giao_dich_all()
     tong_hop_giao_dich_by_month = get_tong_hop_giao_dich_by_month("03/2025")
     tong_hop_giao_dich_thang_hien_tai = get_tong_hop_giao_dich_thang_hien_tai()
+    danh_sach_nguon = tblnguonnoiden.query.all()
+    danh_sach_danh_muc = tbldanhmuc.query.all()
 
 
     thong_ke_thang = {
@@ -36,7 +64,9 @@ def index():
                            tong_hop_giao_dich = tong_hop_giao_dich,
                            tong_hop_giao_dich_thang_hien_tai = tong_hop_giao_dich_thang_hien_tai,
                            tong_hop_giao_dich_by_month = tong_hop_giao_dich_by_month,
-                           giao_dich_hom_nay=giao_dich_hom_nay)
+                           giao_dich_hom_nay=giao_dich_hom_nay,
+                           danh_sach_nguon=danh_sach_nguon,
+                           danh_sach_danh_muc=danh_sach_danh_muc)
 
 if __name__ == "__main__":
     app.run(debug=True)
