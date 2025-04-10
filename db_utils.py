@@ -21,6 +21,9 @@ def get_tong_hop_giao_dich_by_month(month):
 def get_tong_hop_giao_dich_all():
     return vtonghopgiaodich.query.all()
 
+def get_5_giao_dich_gan_nhat():
+    return tblthuchi.query.order_by(tblthuchi.ngay.desc()).limit(5).all()
+
 def add_giao_dich_moi(data):
     """
     Lưu một giao dịch mới vào database.
