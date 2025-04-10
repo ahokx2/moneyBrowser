@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect
 from datetime import date
-from db_utils import get_giao_dich_hom_nay, get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi
+from db_utils import get_giao_dich_hom_nay, get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi, get_5_giao_dich_gan_nhat
 from models import db, tblnguonnoiden, tbldanhmuc
 
 app = Flask(__name__)
@@ -28,9 +28,9 @@ def format_tien(value):
     try:
         value = float(value)
         if value.is_integer():
-            return f"{int(value):,}".replace(",", ".")  # 75000000 → 75.000.000
+            return f"{int(value):,}".replace(",", ".") + " đ"  # 75000000 → 75.000.000
         else:
-            return f"{value:,.2f}".replace(",", ".").replace(".", ",", 1)  # nếu có phần thập phân
+            return f"{value:,.2f}".replace(",", ".").replace(".", ",", 1) + " đ"  # nếu có phần thập phân
     except:
         return value
 
@@ -46,7 +46,7 @@ def them_giao_dich():
 @app.route("/")
 def index():
     giao_dich_hom_nay = get_giao_dich_hom_nay()
-    #giao_dich_all = get_giao_dich_all()
+    giao_dich_gan_nhat = get_5_giao_dich_gan_nhat()
     tong_hop_giao_dich = get_tong_hop_giao_dich_all()
     tong_hop_giao_dich_by_month = get_tong_hop_giao_dich_by_month("03/2025")
     tong_hop_giao_dich_thang_hien_tai = get_tong_hop_giao_dich_thang_hien_tai()
@@ -61,6 +61,7 @@ def index():
     return render_template('index.html',
                            today = hom_nay,
                            thang_hien_tai = thang_hien_tai,
+                           giao_dich_gan_nhat = giao_dich_gan_nhat,
                            tong_hop_giao_dich = tong_hop_giao_dich,
                            tong_hop_giao_dich_thang_hien_tai = tong_hop_giao_dich_thang_hien_tai,
                            tong_hop_giao_dich_by_month = tong_hop_giao_dich_by_month,
