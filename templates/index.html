@@ -85,27 +85,79 @@
             </form>
         </div>
     </div>
-    <!-- Tổng quan tài chính -->
-    <div class="mb-4">
-        <p class="font-semibold text-gray-700 border-b pb-1 mb-2">Tổng quan tài chính tháng : {{ thang_hien_tai }}</p>
-        <ul class="pl-4 list-disc">
-            {% for gd in tong_hop_giao_dich_thang_hien_tai %}
-                <li>{{ gd.ten_nguon }}: {{ gd.dau_ky | format_tien }} – {{ gd.thu | format_tien }} -  {{ gd.chi | format_tien }} - {{ gd.chuyen_doi | format_tien }} - {{ gd.cuoi_ky | format_tien }}</li>
-            {% endfor %}
-        </ul>
 
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {% for gd in tong_hop_giao_dich_thang_hien_tai %}
+        <div class="bg-white rounded-lg shadow p-4">
+            <h3 class="text-md font-semibold text-gray-800 mb-2">{{ gd.ten_nguon }}</h3>
+            <div class="text-sm text-gray-600 space-y-1">
+                <p><strong>Đầu kỳ :</strong> {{ gd.dau_ky | format_tien }}</p>
+                <p class="text-green-600"><strong>Thu -></strong> {{ gd.thu | format_tien }}</p>
+                <p class="text-red-600"><strong>Chi -></strong> {{ gd.chi | format_tien }}</p>
+                <p class="text-yellow-600"><strong>Chuyển đổi -> </strong> {{ gd.chuyen_doi | format_tien }}</p>
+                <p><strong>Cuối kỳ: {{ gd.cuoi_ky | format_tien }}</strong> </p>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 
     <hr class="my-4 border-gray-300">
-    <!-- tất cả giao dịch -->
-    <div>
-        <p class="font-semibold">Tất cả giao dịch hôm nay: {{ today.strftime('%d/%m/%Y') }}</p>
-        <ul class="pl-4 list-disc">
-            {% for gd in giao_dich_hom_nay %}
-                <li>{{ gd.id }}: {{ gd.ngay }} – {{ gd.loai_giao_dich }} -  {{ gd.nguon_tien_obj.ten_nguon }} - {{ gd.noi_den_obj.ten_nguon }}  - {{ gd.so_tien | format_tien }}₫ - {{ gd.ghi_chu }} - {{ gd.danh_muc_obj.ten_danh_muc }}</li>
+    <div class="mb-6">
+        <p class="font-semibold text-gray-700 border-b pb-1 mb-2">5 giao dịch gần nhất</p>
+    
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {% for gd in giao_dich_gan_nhat %}
+            <div class="bg-white rounded-md shadow-sm p-4 border border-gray-100">
+                <!-- Tiêu đề: emoji + loại + danh mục -->
+                <p class="text-sm font-semibold mb-1
+                    {% if gd.loai_giao_dich == 'thu' %}
+                        text-green-700
+                    {% elif gd.loai_giao_dich == 'chi' %}
+                        text-red-700
+                    {% else %}
+                        text-yellow-700
+                    {% endif %}
+                ">
+                    {% if gd.loai_giao_dich == 'Thu' %}
+                        📥
+                    {% elif gd.loai_giao_dich == 'Chi' %}
+                        📤
+                    {% else %}
+                        🔄
+                    {% endif %}
+                    {{ gd.loai_giao_dich | capitalize }} • {{ gd.danh_muc_obj.ten_danh_muc }} : <span class="text-sm font-bold mt-2 
+                    {% if gd.loai_giao_dich == 'Thu' %}
+                        text-green-600
+                    {% elif gd.loai_giao_dich == 'Chi' %}
+                        text-red-600
+                    {% else %}
+                        text-yellow-600
+                    {% endif %}
+                    ">{{ gd.so_tien | format_tien }}</span>
+                    
+                </p>
+                <!-- Số tiền nằm dưới cùng -->
+                
+    
+                <!-- Thông tin phụ: ngày, mã, nguồn -->
+                <p class="text-xs text-gray-500 leading-snug">
+                    {{ gd.ngay }} • Mã: {{ gd.id }}<br>
+                    Nguồn: {{ gd.nguon_tien_obj.ten_nguon }}
+                    {% if gd.noi_den_obj %}
+                        → {{ gd.noi_den_obj.ten_nguon }}
+                    {% endif %}
+                </p>
+    
+                <!-- Ghi chú (nếu có) -->
+                {% if gd.ghi_chu %}
+                <p class="text-xs text-gray-400 italic mt-1">“{{ gd.ghi_chu }}”</p>
+                {% endif %}
+
+            </div>
             {% endfor %}
-        </ul>
+        </div>
     </div>
+    
 
     <script>
         document.querySelector("form").addEventListener("submit", function (e) {
