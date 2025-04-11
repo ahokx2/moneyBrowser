@@ -7,6 +7,14 @@ def get_giao_dich_hom_nay():
     today = date.today().strftime('%d/%m/%Y')  # format tùy theo bạn lưu
     return tblthuchi.query.filter_by(ngay=today).all()
 
+def get_giao_dich_by_date(date_str):
+    """
+    Lấy giao dịch theo ngày.
+    :param date_str: Ngày theo định dạng 'dd/mm/yyyy'
+    :return: Danh sách giao dịch
+    """
+    return tblthuchi.query.filter_by(ngay=date_str).all()
+
 def get_giao_dich_all():
     return tblthuchi.query.all()
 
@@ -41,6 +49,7 @@ def add_giao_dich_moi(data):
             danh_muc=data.get('danh_muc')
         )
         db.session.add(giao_dich)
+        print(data)
         db.session.commit()
         return True
     except Exception as e:

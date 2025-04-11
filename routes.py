@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect
 from datetime import date
-from db_utils import get_giao_dich_hom_nay, get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi, get_5_giao_dich_gan_nhat
+from db_utils import get_giao_dich_hom_nay, get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_giao_dich_by_date
 from models import db, tblnguonnoiden, tbldanhmuc
 
 app = Flask(__name__)
@@ -42,6 +42,20 @@ def them_giao_dich():
         return redirect("/")  # hoặc redirect(url_for('index'))
     else:
         return "Lỗi khi thêm giao dịch", 500
+
+@app.route("/loc_theo_ngay", methods=["GET"])
+def loc_theo_ngay():
+    ngay_loc = request.args.get("ngay_loc")  # yyyy-mm-dd
+    if ngay_loc:
+        # Convert sang dd/mm/yyyy nếu mày lưu vậy trong DB
+        parts = ngay_loc.split("-")
+        formatted = f"{parts[2]}/{parts[1]}/{parts[0]}"
+        giao_dich = get_giao_dich_by_date(formatted)
+    else:
+        giao_dich = []
+
+    return render_template("by_date.html", giao_dich_theo_ngay=giao_dich,
+                           ngay_loc = ngay_loc)
     
 @app.route("/")
 def index():
@@ -53,11 +67,6 @@ def index():
     danh_sach_nguon = tblnguonnoiden.query.all()
     danh_sach_danh_muc = tbldanhmuc.query.all()
 
-
-    thong_ke_thang = {
-        'thu': 15000000,
-        'chi': 5000000
-    }
     return render_template('index.html',
                            today = hom_nay,
                            thang_hien_tai = thang_hien_tai,
