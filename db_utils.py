@@ -18,6 +18,11 @@ def get_giao_dich_by_date(date_str):
 def get_giao_dich_all():
     return tblthuchi.query.all()
 
+def get_giao_dich_thang_hien_tai():
+    today = date.today()
+    month = today.strftime('%m/%Y')
+    return tblthuchi.query.filter(tblthuchi.ngay.like(f'%/{month}')).order_by(tblthuchi.ngay.desc()).all()
+
 def get_tong_hop_giao_dich_thang_hien_tai():
     today = date.today()
     month = today.strftime('%m/%Y')
@@ -30,7 +35,7 @@ def get_tong_hop_giao_dich_all():
     return vtonghopgiaodich.query.all()
 
 def get_5_giao_dich_gan_nhat():
-    return tblthuchi.query.order_by(tblthuchi.ngay.desc()).limit(5).all()
+    return tblthuchi.query.order_by(tblthuchi.id.desc()).limit(5).all()
 
 def add_giao_dich_moi(data):
     """

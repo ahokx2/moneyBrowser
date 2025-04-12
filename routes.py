@@ -1,8 +1,8 @@
 import os
 from flask import Flask, render_template, request, redirect
 from datetime import date
-from db_utils import get_giao_dich_hom_nay, get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_giao_dich_by_date
-from models import db, tblnguonnoiden, tbldanhmuc
+from db_utils import get_giao_dich_hom_nay, get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_giao_dich_by_date, get_giao_dich_thang_hien_tai, get_giao_dich_by_date
+from models import db, tblnguonnoiden, tbldanhmuc, tblthuchi
 
 app = Flask(__name__)
 
@@ -43,6 +43,13 @@ def them_giao_dich():
     else:
         return "Lỗi khi thêm giao dịch", 500
 
+@app.route("/xoa_giao_dich/<int:id>")
+def xoa_giao_dich(id):
+    gd = tblthuchi.query.get_or_404(id)
+    db.session.delete(gd)
+    db.session.commit()
+    return redirect(request.referrer or "/")
+
 @app.route("/loc_theo_ngay", methods=["GET"])
 def loc_theo_ngay():
     ngay_loc = request.args.get("ngay_loc")  # yyyy-mm-dd
@@ -57,26 +64,37 @@ def loc_theo_ngay():
     return render_template("by_date.html", giao_dich_theo_ngay=giao_dich,
                            ngay_loc = ngay_loc)
     
-@app.route("/")
+@app.route("/", methods = ["GET"])
 def index():
-    giao_dich_hom_nay = get_giao_dich_hom_nay()
-    giao_dich_gan_nhat = get_5_giao_dich_gan_nhat()
-    tong_hop_giao_dich = get_tong_hop_giao_dich_all()
-    tong_hop_giao_dich_by_month = get_tong_hop_giao_dich_by_month("03/2025")
-    tong_hop_giao_dich_thang_hien_tai = get_tong_hop_giao_dich_thang_hien_tai()
+    # giao_dich_hom_nay = get_giao_dich_hom_nay()
+    # giao_dich_gan_nhat = get_5_giao_dich_gan_nhat()
+    # tong_hop_giao_dich = get_tong_hop_giao_dich_all()
+    # tong_hop_giao_dich_by_month = get_tong_hop_giao_dich_by_month("03/2025")
+    # tong_hop_giao_dich_thang_hien_tai = get_tong_hop_giao_dich_thang_hien_tai()
     danh_sach_nguon = tblnguonnoiden.query.all()
     danh_sach_danh_muc = tbldanhmuc.query.all()
+
+    ngay_loc = request.args.get("ngay_loc")  # xem giao dịch theo ngày
+    xem_thang = request.args.get("xem_thang") # xem giao dịch tháng hiện tại
+
+    if ngay_loc:
+        # Convert sang dd/mm/yyyy nếu mày lưu vậy trong DB
+        parts = ngay_loc.split("-")
+        formatted = f"{parts[2]}/{parts[1]}/{parts[0]}"
+        giao_dich = get_giao_dich_by_date(formatted) # lấy giao dịch theo ngày
+        title = f"Giao dịch ngày {formatted}"
+    elif xem_thang:
+        giao_dich = get_giao_dich_thang_hien_tai() # lấy giao dịch tháng hiện tại
+        title = "Giao dịch tháng hiện tại : " + thang_hien_tai
+    else:
+        giao_dich = get_5_giao_dich_gan_nhat() # lấy 5 giao dịch gần nhất
+        title = "5 giao dịch gần nhất"
 
     return render_template('index.html',
                            today = hom_nay,
                            thang_hien_tai = thang_hien_tai,
-                           giao_dich_gan_nhat = giao_dich_gan_nhat,
-                           tong_hop_giao_dich = tong_hop_giao_dich,
-                           tong_hop_giao_dich_thang_hien_tai = tong_hop_giao_dich_thang_hien_tai,
-                           tong_hop_giao_dich_by_month = tong_hop_giao_dich_by_month,
-                           giao_dich_hom_nay=giao_dich_hom_nay,
-                           danh_sach_nguon=danh_sach_nguon,
-                           danh_sach_danh_muc=danh_sach_danh_muc)
+                           title = title,
+                           giao_dich = giao_dich)
 
 if __name__ == "__main__":
     app.run(debug=True)
