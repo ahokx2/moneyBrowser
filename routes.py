@@ -94,7 +94,9 @@ def index():
                            today = hom_nay,
                            thang_hien_tai = thang_hien_tai,
                            title = title,
-                           giao_dich = giao_dich)
+                           giao_dich = giao_dich,
+                           danh_sach_nguon = danh_sach_nguon,
+                           danh_sach_danh_muc = danh_sach_danh_muc)
 
 if __name__ == "__main__":
     app.run(debug=True)
