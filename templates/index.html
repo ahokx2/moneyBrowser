@@ -6,7 +6,12 @@
     <div class="flex justify-between items-center mb-4">
         <h1 class="font-bold text-base">Báo cáo tài chính</h1>
         <div class="flex gap-2">
-            <!-- <button class="text-blue-500 underline text-sm">+ Thêm giao dịch</button> -->
+            {% if current_user.is_authenticated %}
+                <div class="text-sm text-gray-700">
+                    👋 Xin chào, <strong>{{ current_user.username }}</strong>!
+                    <a href="{{ url_for('logout') }}" class="ml-2 text-red-600 underline">[Đăng xuất]</a>
+                </div>
+            {% endif %}
             <button onclick="document.getElementById('modalForm').classList.remove('hidden')" class="text-blue-500 underline text-sm">
                 ➕ Thêm giao dịch
             </button>
