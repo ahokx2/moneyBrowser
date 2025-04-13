@@ -1,8 +1,9 @@
 import os
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash, url_for
 from datetime import date
 from db_utils import get_giao_dich_hom_nay, get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_giao_dich_by_date, get_giao_dich_thang_hien_tai, get_giao_dich_by_date
-from models import db, tblnguonnoiden, tbldanhmuc, tblthuchi
+from models import db, tblnguonnoiden, tbldanhmuc, tblthuchi, User
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 
 app = Flask(__name__)
 
@@ -12,8 +13,17 @@ db_path = os.path.join(basedir, 'moneyBrowser.db3')  # nếu db nằm ngoài th�
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'some_very_secret_key'
+
+login_manager = LoginManager()
+login_manager.login_view = 'login'  # tên của route login
+login_manager.init_app(app)
 
 db.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 hom_nay = date.today()  # format tùy theo bạn lưu
 thang_hien_tai = hom_nay.strftime('%m/%Y')
@@ -33,6 +43,27 @@ def format_tien(value):
             return f"{value:,.2f}".replace(",", ".").replace(".", ",", 1) + " đ"  # nếu có phần thập phân
     except:
         return value
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            flash("Sai tài khoản hoặc mật khẩu", "danger")
+    return render_template("login.html")
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
 
 @app.route("/them_giao_dich", methods=["POST"])
 def them_giao_dich():
@@ -65,6 +96,7 @@ def loc_theo_ngay():
                            ngay_loc = ngay_loc)
     
 @app.route("/", methods = ["GET"])
+@login_required
 def index():
     # giao_dich_hom_nay = get_giao_dich_hom_nay()
     # giao_dich_gan_nhat = get_5_giao_dich_gan_nhat()
