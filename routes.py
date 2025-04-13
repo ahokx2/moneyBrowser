@@ -1,8 +1,8 @@
 import os
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, jsonify
 from datetime import date
-from db_utils import get_giao_dich_hom_nay, get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_giao_dich_by_date, get_giao_dich_thang_hien_tai, get_giao_dich_by_date
-from models import db, tblnguonnoiden, tbldanhmuc, tblthuchi, User
+from db_utils import get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_giao_dich_by_date, get_giao_dich_thang_hien_tai, get_giao_dich_by_date, get_bieu_do_phan_tram_nguon_tien, get_bieu_do_phan_tram_nguon_tien_by_month
+from models import db, tblnguonnoiden, tbldanhmuc, tblthuchi, User, vbieudophantramnguontien
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 
 app = Flask(__name__)
@@ -65,6 +65,22 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+@app.route('/api/phantram-nguontien')
+def get_bieu_do_nguon_tien():
+    thang = request.args.get('thang')
+    # data = vbieudophantramnguontien.query.filter_by(thang=thang).all()
+    # data = get_bieu_do_phan_tram_nguon_tien_by_month(thang)
+    data = get_tong_hop_giao_dich_by_month(thang)
+    result = [
+        {
+            "nguon_tien": item.nguon_tien,
+            "ten_nguon": item.ten_nguon,
+            "phan_tram_cuoi_ky": item.cuoi_ky
+        }
+        for item in data
+    ]
+    return jsonify(result)
+
 @app.route("/them_giao_dich", methods=["POST"])
 def them_giao_dich():
     data = request.form.to_dict()
@@ -121,12 +137,14 @@ def index():
     else:
         giao_dich = get_5_giao_dich_gan_nhat() # lấy 5 giao dịch gần nhất
         title = "5 giao dịch gần nhất"
+        bieu_do_thang_hien_tai = get_bieu_do_phan_tram_nguon_tien_by_month(thang_hien_tai) # lấy biểu đồ theo tháng hiện tại
 
     return render_template('index.html',
                            today = hom_nay,
                            thang_hien_tai = thang_hien_tai,
                            title = title,
                            giao_dich = giao_dich,
+                           bieu_do_thang_hien_tai = bieu_do_thang_hien_tai,
                            danh_sach_nguon = danh_sach_nguon,
                            danh_sach_danh_muc = danh_sach_danh_muc)
 

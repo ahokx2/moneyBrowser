@@ -48,6 +48,13 @@ class vtonghopgiaodich(db.Model):
     chuyen_doi = db.Column(db.Float)
     cuoi_ky = db.Column(db.Float)
 
+class vbieudophantramnguontien(db.Model):
+    __tablename__ = 'vbieudophantramnguontien' 
+    thang = db.Column(db.String(100), primary_key=True)
+    nguon_tien = db.Column(db.String(100), primary_key=True)
+    ten_nguon = db.Column(db.String(100))
+    phan_tram = db.Column(db.Float)
+
 class User(UserMixin, db.Model):  # ✅ kế thừa UserMixin
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)

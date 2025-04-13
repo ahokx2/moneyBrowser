@@ -1,5 +1,4 @@
-from models import tblthuchi
-from models import vtonghopgiaodich
+from models import tblthuchi, vtonghopgiaodich, vbieudophantramnguontien
 from datetime import date
 from models import db
 
@@ -30,6 +29,12 @@ def get_tong_hop_giao_dich_thang_hien_tai():
 
 def get_tong_hop_giao_dich_by_month(month):
     return vtonghopgiaodich.query.filter_by(thang=month).all()
+
+def get_bieu_do_phan_tram_nguon_tien(): #bieu_do_phan_tram_nguon_tien dùng để lấy dữ liệu cho biểu đồ
+    return vbieudophantramnguontien.query.all()
+
+def get_bieu_do_phan_tram_nguon_tien_by_month(month):   #bieu_do_phan_tram_nguon_tien dùng để lấy dữ liệu cho biểu đồ theo thang
+    return vbieudophantramnguontien.query.filter_by(thang=month).all()
 
 def get_tong_hop_giao_dich_all():
     return vtonghopgiaodich.query.all()
