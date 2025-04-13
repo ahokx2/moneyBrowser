@@ -1,0 +1,19 @@
+
+
+canvas {
+    width: 100% !important;  /* Bắt canvas co giãn theo container */
+    height: auto !important;
+}
+
+.chart-container {
+    max-width: 500px;
+    width: 90%;
+    margin: 0 auto;
+    padding: 20px 0;
+  }
+  
+  @media (min-width: 768px) {
+    .chart-container {
+      max-width: 500px;
+    }
+  }
