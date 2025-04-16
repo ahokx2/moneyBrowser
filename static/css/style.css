@@ -1,19 +1,137 @@
-
-
-canvas {
-    width: 100% !important;  /* Bắt canvas co giãn theo container */
-    height: auto !important;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #000000;
+  color: #2fff00;
+  padding-bottom: 60px; /* Đảm bảo nội dung không bị che bởi toolbar */
 }
 
-.chart-container {
-    max-width: 500px;
-    width: 90%;
-    margin: 0 auto;
-    padding: 20px 0;
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px;
+}
+
+.giao-dich {
+  /* display: flex; */
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  border-bottom: 1px dashed #444;
+  font-size: 14px;
+}
+
+.giao-dich .ngay {
+  flex: 1;
+  color: #aaa;
+}
+
+.giao-dich .ghichu {
+  flex: 2;
+  color: #ccc;
+  padding: 0 10px;
+}
+
+.giao-dich .so-tien {
+  flex: 1;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: right;
+}
+
+/* Màu theo loại giao dịch */
+.giao-dich.thu .so-tien {
+  color: #00ff00;
+}
+
+.giao-dich.thu {
+  color: #00ff00;
+}
+
+.giao-dich.chi .so-tien {
+  color: #ff3333;
+}
+
+.giao-dich.chi {
+  color: #ff3333;
+}
+
+.giao-dich.chuyendoi .so-tien {
+  color: #ffcc00;
+}
+
+.giao-dich.chuyendoi {
+  color: #ffcc00;
+}
+
+.toolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #f8f8f8;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 60px;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+  z-index: 1000; /* Đảm bảo toolbar luôn nằm trên cùng */
+}
+
+.table_phan_tram_nguon_tien{
+  color : #ffffff;
+}
+
+
+.toolbar button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #000;
+  padding: 10px;
+  transition: background-color 0.2s; /* Hiệu ứng mượt khi nhấn */
+}
+
+.toolbar button:hover,
+.toolbar button:focus {
+  background-color: #e0e0e0; /* Hiệu ứng khi hover hoặc nhấn */
+  outline: none;
+}
+
+@media (max-width: 600px) {
+  h1 {
+      font-size: 20px;
   }
-  
-  @media (min-width: 768px) {
-    .chart-container {
-      max-width: 500px;
-    }
+  p {
+      font-size: 14px;
   }
+  .container {
+      padding: 15px;
+  }
+  .toolbar {
+      height: 50px; /* Toolbar nhỏ hơn trên mobile */
+  }
+  .toolbar button {
+      font-size: 20px;
+      padding: 8px;
+  }
+}
