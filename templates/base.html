@@ -4,12 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Tổng quan tài chính{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- <link rel="stylesheet" href="https://unpkg.com/7.css"> -->
     
 </head>
-<body class="bg-gray-100 p-4">
+<body>
+    <div>
+        👋 Xin chào, <strong>{{ current_user.username }}</strong>!
+        <a href="{{ url_for('logout') }}" class="ml-2 text-red-600 underline">[Đăng xuất]</a>
+    </div>
+    
     {% block content %}{% endblock %}
 </body>
 </html>
