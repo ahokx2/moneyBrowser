@@ -52,8 +52,8 @@
                     {% for row in data1 %}
                     <tr>
                         <td>{{ row.ten_nguon }}</td>
-                        <td style="text-align: right;">{{ "{:,.0f}".format(row.tong_so_tien) }} ₫</td>
-                        <td style = "color: #f2ff9c; text-align: right;">{{ row.phan_tram }} %</td>
+                        <td style="text-align: right;">{{ "{:,.0f}".format(row.tong_so_tien) }}</td>
+                        <td style = "color: #f2ff9c; text-align: right;">{{ row.phan_tram }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -66,10 +66,10 @@
             {% if data2 %}
                 {% for row in data2 %}
                 <div class = "giao-dich">
-                    Thu : <span class = "so-tien" style = "color: #00ff00;">{{ "{:,.0f}".format(row.thu) }} ₫</span><br>
-                    Chi : <span class = "so-tien" style = "color : #ff3333;">{{ "{:,.0f}".format(row.chi) }} ₫</span><br>
-                    Tích Lũy : <span class ="so-tien" style = "color : #5148fc;">{{ "{:,.0f}".format(row.tich_luy) }} ₫</span><br>
-                    Đạt được : <span class ="so-tien" style = "color: #ffffff;">{{ row.phan_tram_tich_luy }} %</span>
+                    Thu : <span class = "so-tien" style = "color: #00ff00;">{{ "{:,.0f}".format(row.thu) }}</span><br>
+                    Chi : <span class = "so-tien" style = "color : #ff3333;">{{ "{:,.0f}".format(row.chi) }}</span><br>
+                    Tích Lũy : <span class ="so-tien" style = "color : #5148fc;">{{ "{:,.0f}".format(row.tich_luy) }}</span><br>
+                    Đạt được : <span class ="so-tien" style = "color: #ffffff;">{{ row.phan_tram_tich_luy }}</span>
                 </div>
                 {% endfor %}
             {% else %}
