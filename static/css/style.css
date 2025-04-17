@@ -1,25 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Quicksand', sans-serif;
   background-color: #000000;
-  color: #2fff00;
+  color: #ffffff;
   padding-bottom: 60px; /* Đảm bảo nội dung không bị che bởi toolbar */
+  max-width: 480px;  /* Kích thước tương đương iPhone */
+  margin: 0 auto;
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  padding: 10px;
 }
 
 h1 {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 20px;
+  margin-bottom: 15px;
 }
 
 p {
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 12px;
+  /* line-height: 1.5; */
+}
+
+.logout-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #2fff00;
+  font-size: 14px;
+  background: #111;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #2fff00;
+  cursor: pointer;
 }
 
 .container {
@@ -74,11 +89,11 @@ p {
 }
 
 .giao-dich.chuyendoi .so-tien {
-  color: #ffcc00;
+  color: #5148fc;
 }
 
 .giao-dich.chuyendoi {
-  color: #ffcc00;
+  color: #5148fc;
 }
 
 .toolbar {
@@ -97,6 +112,10 @@ p {
 }
 
 .table_phan_tram_nguon_tien{
+  color : #ffffff;
+}
+
+.table_tich_luy{
   color : #ffffff;
 }
 
