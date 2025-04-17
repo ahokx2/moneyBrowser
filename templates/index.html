@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h2>{{ tieu_de }}</h2>
+    <h2>{{ tieu_de }} tháng : {{ thang_hien_tai }}</h2>
     <hr>
     {% if kieu == 'chi_tiet' %}
         {% if data %}
@@ -40,46 +40,63 @@
         {% endif %}
     {% else %}
         <div class="container">
-            <h3>{{ tieu_de_data }}</h3>
-            {% if data %}
-            {% for gd in data[:5] %}
-                <div class="giao-dich {{ gd.loai_giao_dich|slugify }}">
-                    <span class="id">{{ gd.id }}</span> 📅
-                    <span class="ngay">{{ gd.ngay }}</span> ➡️
-                        {% if gd.loai_giao_dich=='Thu' %} 
-                            <span class ="giao-dich Thu"> {{ gd.loai_giao_dich }}
-                        {% elif gd.loai_giao_dich=='Chi' %}
-                            <span class ="giao-dich Chi"> {{ gd.loai_giao_dich }}
-                        {% else %}
-                            <span class ="giao-dich Chi"> {{ gd.loai_giao_dich }}
-                        {% endif %}
-                    </span> => {{ gd.nguon_tien_obj.ten_nguon }}
-                    <span class="ghichu">{{ gd.ghi_chu or 'Không ghi chú' }}</span>
-                    <span class="so-tien">{{ "{:,.0f}".format(gd.so_tien) }}₫</span>
-                </div>
-            {% endfor %}
-            {% else %}
-            <p>Không có dữ liệu giao dịch.</p>
-            {% endif %}
-
+            <!-- Tổng hợp tỷ lệ nguồn tiền -->
             <h3> {{ tieu_de_data1 }}</h3>
             {% if data1 %}
-                <table border="1" cellpadding="8" cellspacing="0" class ="table_phan_tram_nguon_tien">
+                <table border="1" cellpadding="4" cellspacing="0" class ="table_phan_tram_nguon_tien">
                     <tr>
-                        <th>Tháng</th>
                         <th>Nguồn tiền</th>
-                        <th>Phần trăm</th>
+                        <th>Số tiền</th>
+                        <th>Tỷ lệ</th>
                     </tr>
                     {% for row in data1 %}
                     <tr>
-                        <td>{{ row.thang }}</td>
                         <td>{{ row.ten_nguon }}</td>
-                        <td style = "color: #f2ff9c">{{ row.phan_tram }}</td>
+                        <td style="text-align: right;">{{ "{:,.0f}".format(row.tong_so_tien) }} ₫</td>
+                        <td style = "color: #f2ff9c; text-align: right;">{{ row.phan_tram }} %</td>
                     </tr>
                     {% endfor %}
                 </table>
             {% else %}
                 <p>Không có dữ liệu giao dịch.</p>
+            {% endif %}
+            <hr>
+            <!-- Tích lũy  -->
+            <h3>{{ tieu_de_data2 }}</h3>
+            {% if data2 %}
+                {% for row in data2 %}
+                <div class = "giao-dich">
+                    Thu : <span class = "so-tien" style = "color: #00ff00;">{{ "{:,.0f}".format(row.thu) }} ₫</span><br>
+                    Chi : <span class = "so-tien" style = "color : #ff3333;">{{ "{:,.0f}".format(row.chi) }} ₫</span><br>
+                    Tích Lũy : <span class ="so-tien" style = "color : #5148fc;">{{ "{:,.0f}".format(row.tich_luy) }} ₫</span><br>
+                    Đạt được : <span class ="so-tien" style = "color: #ffffff;">{{ row.phan_tram_tich_luy }} %</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Không có dữ liệu giao dịch.</p>
+            {% endif %}
+            <hr>
+            <!-- 5 giao dịch gần nhất -->
+            <h3>{{ tieu_de_data }}</h3> 
+            {% if data %}
+            {% for gd in data[:5] %}
+                <div class="giao-dich {{ gd.loai_giao_dich|slugify }}">
+                    <span class="id">🆔 {{ gd.id }}</span> 📅
+                    <span class="ngay">{{ gd.ngay }}</span> 
+                        {% if gd.loai_giao_dich=='Thu' %} 
+                            <span class ="thu"> {{ gd.loai_giao_dich }}
+                        {% elif gd.loai_giao_dich=='Chi' %}
+                            <span class ="chi"> {{ gd.loai_giao_dich }}
+                        {% else %}
+                            <span class ="chuyendoi"> {{ gd.loai_giao_dich }}
+                        {% endif %}
+                    </span> : {{ gd.nguon_tien_obj.ten_nguon }} ➡️ {{ gd.noi_den_obj.ten_nguon }}
+                    <!-- <span class="ghichu">{{ gd.ghi_chu or 'Không ghi chú' }}</span> -->
+                    <span class="so-tien">{{ "{:,.0f}".format(gd.so_tien) }}₫</span>
+                </div>
+            {% endfor %}
+            {% else %}
+            <p>Không có dữ liệu giao dịch.</p>
             {% endif %}
 
         </div>

@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block content %}
+<body class="bg-white text-sm p-4 text-gray-800">
+    <!-- Thanh công cụ -->
+    <div class="flex justify-between items-center mb-4">
+        <!-- --------------------------- -->
+        <h1 class="font-bold text-base">Báo cáo tài chính</h1>
+        <div class="p-4">
+            {% if current_user.is_authenticated %}
+                <div class="text-sm text-gray-700">
+                    👋 Xin chào, <strong>{{ current_user.username }}</strong>!
+                    <a href="{{ url_for('logout') }}" class="ml-2 text-red-600 underline">[Đăng xuất]</a>
+                </div>
+            {% endif %}
+            <!-- Phần nội dung khác của trang -->
+        </div>
+        <!-- --------------------------- -->
+    </div>
+
+        <!-- Modal lọc theo ngày -->
+    <div id="modalFilterNgay" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+            <h2 class="text-base font-semibold mb-4">Chọn ngày cần lọc</h2>
+
+            <form method="GET" action="/" class="space-y-4">
+                <div>
+                    <label for="ngay_loc" class="block mb-1 text-gray-700">Ngày:</label>
+                    <input type="date" id="ngay_loc" name="ngay_loc" class="w-full border rounded p-2 text-sm" required>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="document.getElementById('modalFilterNgay').classList.add('hidden')" 
+                            class="text-sm text-gray-500 underline">Hủy</button>
+                    <button type="submit" class="text-sm bg-blue-500 text-white px-3 py-1 rounded">Lọc</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div id="modalForm" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+            <h2 class="text-base font-semibold mb-4">Thêm giao dịch mới</h2>
+    
+            <form method="POST" action="/them_giao_dich" class="space-y-3">
+                <div>
+                    <!-- <label class="block text-sm mb-1">Ngày</label>
+                    <input name="ngay" type="text" value="{{ today.strftime('%d/%m/%Y') }}" class="w-full border rounded px-2 py-1" required> -->
+                    <label for="ngay" class="block mb-1 text-gray-700">Ngày:</label>
+                    <input type="date" id="ngay_input" class="w-full border rounded p-2 text-sm" required>
+                    <input type="hidden" name="ngay" id="ngay_hidden">
+                </div>
+        
+                <div>
+                <label class="block text-sm mb-1">Loại giao dịch</label>
+                <select name="loai_giao_dich" class="w-full border rounded px-2 py-1" required>
+                    <option value="Thu">Thu</option>
+                    <option value="Chi">Chi</option>
+                    <option value="Chuyển đổi">Chuyển đổi</option>
+                </select>
+                </div>
+        
+                <div>
+                    <label class="block text-sm mb-1">Nguồn tiền</label>
+                    <select name="nguon_tien" class="w-full border rounded px-2 py-1" required>
+                    {% for nguon in danh_sach_nguon %}
+                        <option value="{{ nguon.ma_nguon }}">{{ nguon.ten_nguon }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+        
+                <div>
+                    <label class="block text-sm mb-1">Nơi đến</label>
+                    <select name="noi_den" class="w-full border rounded px-2 py-1">
+                    <option value="">-- Không có --</option>
+                    {% for nguon in danh_sach_nguon %}
+                        <option value="{{ nguon.ma_nguon }}">{{ nguon.ten_nguon }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+        
+                <div>
+                    <label class="block text-sm mb-1">Số tiền</label>
+                    <input name="so_tien" type="number" step="1000" class="w-full border rounded px-2 py-1" required>
+                </div>
+        
+                <div>
+                    <label class="block text-sm mb-1">Ghi chú</label>
+                    <input name="ghi_chu" type="text" class="w-full border rounded px-2 py-1">
+                </div>
+        
+                <div>
+                    <label class="block text-sm mb-1">Danh mục</label>
+                    <select name="danh_muc" class="w-full border rounded px-2 py-1">
+                        <option value="">-- Không có --</option>
+                    {% for dm in danh_sach_danh_muc %}
+                        <option value="{{ dm.ma_danh_muc }}">{{ dm.ten_danh_muc }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+        
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="document.getElementById('modalForm').classList.add('hidden')" class="text-sm text-gray-500 underline">Hủy</button>
+                    <button type="submit" class="text-sm bg-blue-500 text-white px-3 py-1 rounded">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {% for gd in tong_hop_giao_dich_thang_hien_tai %}
+        <div class="bg-white rounded-lg shadow p-4">
+            <h3 class="text-md font-semibold text-gray-800 mb-2">{{ gd.ten_nguon }}</h3>
+            <div class="text-sm text-gray-600 space-y-1">
+                <p><strong>Đầu kỳ :</strong> {{ gd.dau_ky | format_tien }}</p>
+                <p class="text-green-600"><strong>Thu -></strong> {{ gd.thu | format_tien }}</p>
+                <p class="text-red-600"><strong>Chi -></strong> {{ gd.chi | format_tien }}</p>
+                <p class="text-yellow-600"><strong>Chuyển đổi -> </strong> {{ gd.chuyen_doi | format_tien }}</p>
+                <p><strong>Cuối kỳ: {{ gd.cuoi_ky | format_tien }}</strong> </p>
+            </div>
+        </div>
+        {% endfor %}
+    </div> -->
+
+    <hr class="my-4 border-gray-300">
+    <div class="mb-6">
+        <p class="font-semibold text-gray-700 border-b pb-1 mb-2">Biểu đồ thống kê</p>
+        
+        <div class="flex justify-center">
+            <div class="chart-container">
+                <canvas id="nguonTienChart"></canvas>
+            </div>
+        </div>
+    </div>
+        <!-- --------------------------------------- -->
+    <hr class="my-4 border-gray-300">
+    <div class="mb-6">
+        <p class="font-semibold text-gray-700 border-b pb-1 mb-2">{{title}}</p>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {% for gd in giao_dich %}
+            <div class="bg-white rounded-md shadow-sm p-4 border border-gray-100">
+                <!-- Tiêu đề: emoji + loại + danh mục -->
+                <p class="text-sm font-semibold mb-1
+                    {% if gd.loai_giao_dich == 'Thu' %}
+                        text-green-700
+                    {% elif gd.loai_giao_dich == 'Chi' %}
+                        text-red-700
+                    {% else %}
+                        text-yellow-700
+                    {% endif %}
+                ">
+                    {% if gd.loai_giao_dich == 'Thu' %}
+                        📥
+                    {% elif gd.loai_giao_dich == 'Chi' %}
+                        📤
+                    {% else %}
+                        🔄
+                    {% endif %}
+                    {{ gd.loai_giao_dich | capitalize }} • {{ gd.danh_muc_obj.ten_danh_muc }} : <span class="text-sm font-bold mt-2 
+                    {% if gd.loai_giao_dich == 'Thu' %}
+                        text-green-600
+                    {% elif gd.loai_giao_dich == 'Chi' %}
+                        text-red-600
+                    {% else %}
+                        text-yellow-600
+                    {% endif %}
+                    ">{{ gd.so_tien | format_tien }}</span>
+                    
+                </p>
+            
+                <p class="text-xs text-gray-500 leading-snug">
+                    {{ gd.ngay }} • 
+                    <a href="javascript:void(0)" onclick="confirmXoa('{{ gd.id }}')" class="text-red-600 font-semibold underline">
+                        Mã: {{ gd.id }}
+                    </a><br>
+                    Nguồn: {{ gd.nguon_tien_obj.ten_nguon }}
+                    {% if gd.noi_den_obj %}
+                        → {{ gd.noi_den_obj.ten_nguon }}
+                    {% endif %}
+                </p>
+    
+                <!-- Ghi chú (nếu có) -->
+                {% if gd.ghi_chu %}
+                <p class="text-xs text-gray-400 italic mt-1">“{{ gd.ghi_chu }}”</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div id="confirmXoaModal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-sm shadow-lg text-center">
+            <p class="mb-4 text-gray-700">Bạn có chắc chắn muốn xóa giao dịch <strong id="maXoa"></strong>?</p>
+            <div class="flex justify-center gap-4">
+                <button onclick="document.getElementById('confirmXoaModal').classList.add('hidden')" 
+                        class="px-4 py-1 bg-gray-200 rounded">Hủy</button>
+                <a id="xoaLink" class="px-4 py-1 bg-red-500 text-white rounded" href="#">Xóa</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thanh công cụ cố định dưới cùng -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3">
+        <button 
+            title="Thêm giao dịch" 
+            onclick="document.getElementById('modalForm').classList.remove('hidden')"
+            class="text-blue-500 text-2xl">
+            ➕
+        </button>
+        <button 
+            title="Lọc theo ngày" 
+            onclick="document.getElementById('modalFilterNgay').classList.remove('hidden')"
+            class="text-gray-500 text-2xl">
+            🔍
+        </button>
+        <a 
+            title="Toàn bộ tháng" 
+            href="/?xem_thang=1" 
+            class="text-gray-500 text-2xl">
+            🗓️
+        </a>
+        <a 
+            title="Trang chủ" 
+            href="/" 
+            class="text-gray-500 text-2xl">
+            🏠
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelector("#modalForm").addEventListener("submit", function (e) {
+                const dateInput = document.getElementById("ngay_input").value;
+                if (dateInput) {
+                    const parts = dateInput.split("-");
+                    const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    document.getElementById("ngay_hidden").value = formattedDate;
+                }
+            });
+        });
+        function confirmXoa(id) {
+            document.getElementById('maXoa').innerText = id;
+            document.getElementById('xoaLink').href = `/xoa_giao_dich/${id}`;
+            document.getElementById('confirmXoaModal').classList.remove('hidden');
+        }
+
+        let chartInstance;
+
+        async function fetchAndRender(thang) {
+            const response = await fetch(`/api/phantram-nguontien?thang=${encodeURIComponent(thang)}`);
+            const data = await response.json();
+
+            const labels = data.map(item => item.ten_nguon);
+            const values = data.map(item => item.phan_tram_cuoi_ky);
+
+            const ctx = document.getElementById('nguonTienChart').getContext('2d');
+
+            // Destroy chart cũ nếu có
+            if (chartInstance) {
+            chartInstance.destroy();
+            }
+
+            // Dò thiết bị, nếu là mobile thì render bar ngang
+            const isMobile = window.innerWidth < 768;
+
+            chartInstance = new Chart(ctx, {
+            type: 'pie',  // dùng "bar" cho cả dọc và ngang
+            data: {
+                labels: labels,
+                datasets: [{
+                label: 'Phần trăm nguồn tiền',
+                data: values,
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#66BB6A'],
+                borderColor: '#fff',
+                borderWidth: 1
+                }],
+                
+            },
+            options: {
+                responsive: true,
+                indexAxis: isMobile ? 'y' : 'x', // ngang nếu mobile, dọc nếu desktop
+                plugins: {
+                legend: {
+                    position: 'bottom', // hoặc 'top', 'left', 'right'
+                    labels: {
+                    color: '#333',
+                    padding: 10
+                    }
+                },
+                title: {
+                    display: true,
+                    text: `Nguồn tiền tháng ${thang}`
+                },
+                legend: {
+                    display: true
+                }
+                }
+                // scales: {
+                // x: {
+                //     beginAtZero: true,
+                //     ticks: {
+                //     callback: (value) => value + '%'
+                //     }
+                // },
+                // y: {
+                //     ticks: {
+                //     autoSkip: false
+                //     }
+                // }
+                // }
+            }
+            });
+        }
+
+        // Gọi lúc đầu
+        const thangHienTai = "{{ thang_hien_tai }}";
+        fetchAndRender(thangHienTai);
+
+        // Optional: render lại khi resize (debounced nếu muốn)
+        // window.addEventListener('resize', () => {
+        //     fetchAndRender(thangHienTai);  // Gọi lại chart khi thay đổi chiều rộng
+        // });
+    </script>
+</body>
+{% endblock %}
