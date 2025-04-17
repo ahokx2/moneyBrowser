@@ -54,6 +54,15 @@ class vbieudophantramnguontien(db.Model):
     nguon_tien = db.Column(db.String(100), primary_key=True)
     ten_nguon = db.Column(db.String(100))
     phan_tram = db.Column(db.Float)
+    tong_so_tien = db.Column(db.Float)
+
+class vtichluy(db.Model):
+    __tablename__ = 'vtichluy' 
+    thang = db.Column(db.String(100), primary_key=True)
+    thu = db.Column(db.Float, primary_key=True)
+    chi = db.Column(db.Float, primary_key=True)
+    tich_luy = db.Column(db.Float, primary_key=True)
+    phan_tram_tich_luy = db.Column(db.Float, primary_key=True)
 
 class User(UserMixin, db.Model):  # ✅ kế thừa UserMixin
     __tablename__ = 'users'

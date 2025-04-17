@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, flash, url_for, jsonify
 from datetime import date
-from db_utils import get_giao_dich_all, get_tong_hop_giao_dich_all, get_tong_hop_giao_dich_by_month, get_tong_hop_giao_dich_thang_hien_tai, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_giao_dich_by_date, get_giao_dich_thang_hien_tai, get_giao_dich_by_date, get_bieu_do_phan_tram_nguon_tien, get_bieu_do_phan_tram_nguon_tien_by_month
+from db_utils import add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_giao_dich_by_date, get_giao_dich_thang_hien_tai, get_giao_dich_by_date, get_bieu_do_phan_tram_nguon_tien, get_bieu_do_phan_tram_nguon_tien_by_month, get_tich_luy_theo_thang
 from models import db, tblnguonnoiden, tbldanhmuc, tblthuchi, User, vbieudophantramnguontien, vtonghopgiaodich
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 import unicodedata
@@ -81,68 +81,52 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
-@app.route('/api/data')
-def api_data():
-    loai = request.args.get("loai")
-    today = date.today().strftime('%Y-%m-%d')
+# @app.route('/api/data')
+# def api_data():
+#     loai = request.args.get("loai")
+#     today = date.today().strftime('%Y-%m-%d')
 
-    if loai == 'tblthuchi':
-        data = tblthuchi.query.order_by(tblthuchi.ngay.desc()).all()
-        result = [{
-            "ngay": g.ngay,
-            "loai_giao_dich": g.loai_giao_dich,
-            "so_tien": g.so_tien,
-            "ghi_chu": g.ghi_chu
-        } for g in data]
+#     if loai == 'tblthuchi':
+#         data = tblthuchi.query.order_by(tblthuchi.ngay.desc()).all()
+#         result = [{
+#             "ngay": g.ngay,
+#             "loai_giao_dich": g.loai_giao_dich,
+#             "so_tien": g.so_tien,
+#             "ghi_chu": g.ghi_chu
+#         } for g in data]
 
-        return jsonify({
-            "success": True,
-            "tieu_de": "Danh sách giao dịch chi tiết",
-            "data": result
-        })
+#         return jsonify({
+#             "success": True,
+#             "tieu_de": "Danh sách giao dịch chi tiết",
+#             "data": result
+#         })
 
-    elif loai == 'tonghop':
-        data = vtonghopgiaodich.query.order_by(vtonghopgiaodich.thang.desc()).all()
-        result = [{
-            "thang": i.thang,
-            "nguon_tien": i.nguon_tien,
-            "ten_nguon": i.ten_nguon,
-            "dau_ky": i.dau_ky,
-            "thu": i.thu,
-            "chi": i.chi,
-            "chuyen_doi": i.chuyen_doi,
-            "cuoi_ky": i.cuoi_ky
-        } for i in data]
+#     elif loai == 'tonghop':
+#         data = vtonghopgiaodich.query.order_by(vtonghopgiaodich.thang.desc()).all()
+#         result = [{
+#             "thang": i.thang,
+#             "nguon_tien": i.nguon_tien,
+#             "ten_nguon": i.ten_nguon,
+#             "dau_ky": i.dau_ky,
+#             "thu": i.thu,
+#             "chi": i.chi,
+#             "chuyen_doi": i.chuyen_doi,
+#             "cuoi_ky": i.cuoi_ky
+#         } for i in data]
 
-        return jsonify({
-            "success": True,
-            "tieu_de": "Báo cáo tổng hợp theo tháng",
-            "data": result
-        })
+#         return jsonify({
+#             "success": True,
+#             "tieu_de": "Báo cáo tổng hợp theo tháng",
+#             "data": result
+#         })
 
-    else:
-        return jsonify({
-            "success": False,
-            "tieu_de": "Lỗi",
-            "message": "Không xác định được loại yêu cầu",
-            "data": []
-    })
-
-@app.route('/api/phantram-nguontien')
-def get_bieu_do_nguon_tien():
-    thang = request.args.get('thang')
-    # data = vbieudophantramnguontien.query.filter_by(thang=thang).all()
-    # data = get_bieu_do_phan_tram_nguon_tien_by_month(thang)
-    data = get_tong_hop_giao_dich_by_month(thang)
-    result = [
-        {
-            "nguon_tien": item.nguon_tien,
-            "ten_nguon": item.ten_nguon,
-            "phan_tram_cuoi_ky": item.cuoi_ky
-        }
-        for item in data
-    ]
-    return jsonify(result)
+#     else:
+#         return jsonify({
+#             "success": False,
+#             "tieu_de": "Lỗi",
+#             "message": "Không xác định được loại yêu cầu",
+#             "data": []
+#     })
 
 @app.route("/them_giao_dich", methods=["POST"])
 def them_giao_dich():
@@ -180,9 +164,11 @@ def index():
     loai = request.args.get('loai')
     data = []
     data1 = []
+    data2 = []
     tieu_de = "Chào mừng!"
     tieu_de_data = ""
     tieu_de_data1 = ""
+    tieu_de_data2 = ""
     kieu = None  # để điều khiển kiểu hiển thị trong template
 
     if loai == 'tblthuchi':
@@ -198,12 +184,14 @@ def index():
     else :
         data = get_5_giao_dich_gan_nhat()
         data1 = get_bieu_do_phan_tram_nguon_tien_by_month(thang_hien_tai)
+        data2 = get_tich_luy_theo_thang(thang_hien_tai)
         tieu_de = "Tổng quan tài chính"
         tieu_de_data = "Danh sách giao dịch gần nhất"
         tieu_de_data1 = "Phần trăm nguồn tiền"
+        tieu_de_data2 = "Thống kê tích lũy"
         kieu = 'tong_quan_tai_chinh'
 
-    return render_template('index.html', tieu_de=tieu_de, data=data, data1=data1, kieu=kieu, tieu_de_data=tieu_de_data, tieu_de_data1=tieu_de_data1)
+    return render_template('index.html', tieu_de=tieu_de, data=data, data1=data1, data2=data2, kieu=kieu, tieu_de_data=tieu_de_data, tieu_de_data1=tieu_de_data1, tieu_de_data2=tieu_de_data2, thang_hien_tai=thang_hien_tai)
 
 if __name__ == "__main__":
     app.run(debug=True)

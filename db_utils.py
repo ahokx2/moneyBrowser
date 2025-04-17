@@ -1,4 +1,4 @@
-from models import tblthuchi, vtonghopgiaodich, vbieudophantramnguontien
+from models import tblthuchi, vtonghopgiaodich, vbieudophantramnguontien, vtichluy
 from datetime import date
 from models import db
 
@@ -26,6 +26,9 @@ def get_tong_hop_giao_dich_thang_hien_tai():
     today = date.today()
     month = today.strftime('%m/%Y')
     return vtonghopgiaodich.query.filter_by(thang=month).all()
+
+def get_tich_luy_theo_thang(month):
+    return vtichluy.query.filter_by(thang=month).all()
 
 def get_tong_hop_giao_dich_by_month(month):
     return vtonghopgiaodich.query.filter_by(thang=month).all()
