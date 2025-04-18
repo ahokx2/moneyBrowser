@@ -1,32 +1,90 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng nhập - Money Browser</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f0f2f5;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-{% block content %}
-<!-- Container full screen để căn giữa -->
-<body class="bg-white text-sm p-4 text-gray-800">
-    <div class="min-h-screen flex items-center justify-center bg-gray-100">
-        <form method="POST" class="bg-white p-6 rounded shadow-md w-96">
-            <h1 class="text-lg font-semibold mb-4">Money Browser</h2>
-            
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <ul>
-                        {% for category, message in messages %}
-                            <li class="text-red-600 text-sm">{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 360px;
+    }
 
-            <div class="mb-4">
-                <label class="block text-sm mb-1">Tên</label>
-                <input type="text" name="username" class="w-full border rounded px-2 py-1" required>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm mb-1">Mật khẩu</label>
-                <input type="password" name="password" class="w-full border rounded px-2 py-1" required>
-            </div>
-            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded">Đăng nhập</button>
-        </form>
-    </div>
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4338ca;
+    }
+
+    .flash {
+      padding: 0.75rem;
+      background: #fee2e2;
+      color: #b91c1c;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Đăng nhập</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <input type="text" name="username" placeholder="Tên đăng nhập" required>
+      <input type="password" name="password" placeholder="Mật khẩu" required>
+      <button type="submit">Đăng nhập</button>
+    </form>
+  </div>
+
 </body>
-{% endblock %}
+</html>

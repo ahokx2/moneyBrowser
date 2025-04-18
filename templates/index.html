@@ -1,21 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <div class="container">
-    <h2>{{ tieu_de }} tháng : {{ thang_hien_tai }}</h2>
+    <h2 style="text-align: center;">{{ tieu_de }} tháng : {{ thang_hien_tai }}</h2>
     <hr>
     {% if kieu == 'chi_tiet' %}
         {% if data %}
-            {% for gd in data %}
-                <p>{{ gd.ngay }} | {{ gd.loai_giao_dich }} | {{ gd.so_tien }} | {{ gd.ghi_chu or '' }}</p>
-            {% endfor %}
+        {% for gd in data[:5] %}
+            <div class="giao-dich {{ gd.loai_giao_dich|slugify }}">
+                <span class="id">🆔 {{ gd.id }}</span> 📅
+                <span class="ngay">{{ gd.ngay }}</span> 
+                    {% if gd.loai_giao_dich=='Thu' %} 
+                        <span class ="thu"> {{ gd.loai_giao_dich }}
+                    {% elif gd.loai_giao_dich=='Chi' %}
+                        <span class ="chi"> {{ gd.loai_giao_dich }}
+                    {% else %}
+                        <span class ="chuyendoi"> {{ gd.loai_giao_dich }}
+                    {% endif %}
+                </span> : {{ gd.nguon_tien_obj.ten_nguon }} ➡️ {{ gd.noi_den_obj.ten_nguon }}
+                <!-- <span class="ghichu">{{ gd.ghi_chu or 'Không ghi chú' }}</span> -->
+                <span class="so-tien">{{ "{:,.0f}".format(gd.so_tien) }}₫</span>
+            </div>
+        {% endfor %}
         {% else %}
-            <p>Không có dữ liệu giao dịch.</p>
+        <p>Không có dữ liệu giao dịch.</p>
         {% endif %}
     
     {% elif kieu == 'tong_hop' %}
         {% if data %}
-            <table border="1" cellpadding="8" cellspacing="0">
+            <table border="0" cellpadding="8" cellspacing="0">
                 <tr>
                     <th>Tháng</th>
                     <th>Nguồn tiền</th>
@@ -53,7 +67,7 @@
                     <tr>
                         <td>{{ row.ten_nguon }}</td>
                         <td style="text-align: right;">{{ "{:,.0f}".format(row.tong_so_tien) }}</td>
-                        <td style = "color: #f2ff9c; text-align: right;">{{ row.phan_tram }}</td>
+                        <td style = "color: #4f5b00; text-align: right;">{{ row.phan_tram }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -65,11 +79,11 @@
             <h3>{{ tieu_de_data2 }}</h3>
             {% if data2 %}
                 {% for row in data2 %}
-                <div class = "giao-dich">
-                    Thu : <span class = "so-tien" style = "color: #00ff00;">{{ "{:,.0f}".format(row.thu) }}</span><br>
+                <div>
+                    Thu : <span class = "so-tien" style = "color: #009a00;">{{ "{:,.0f}".format(row.thu) }}</span><br>
                     Chi : <span class = "so-tien" style = "color : #ff3333;">{{ "{:,.0f}".format(row.chi) }}</span><br>
                     Tích Lũy : <span class ="so-tien" style = "color : #5148fc;">{{ "{:,.0f}".format(row.tich_luy) }}</span><br>
-                    Đạt được : <span class ="so-tien" style = "color: #ffffff;">{{ row.phan_tram_tich_luy }}</span>
+                    Đạt được : <span class ="so-tien" style = "color: #000000;">{{ row.phan_tram_tich_luy }}</span>
                 </div>
                 {% endfor %}
             {% else %}
@@ -81,8 +95,14 @@
             {% if data %}
             {% for gd in data[:5] %}
                 <div class="giao-dich {{ gd.loai_giao_dich|slugify }}">
-                    <span class="id">🆔 {{ gd.id }}</span> 📅
-                    <span class="ngay">{{ gd.ngay }}</span> 
+                    <a href="{{ url_for('xoa_giao_dich', id=gd.id) }}"
+                        onclick="return confirm('Bạn có chắc muốn xoá giao dịch {{ gd.id }}?')"
+                        style="color: #888; text-decoration: none; font-size: 12px;"
+                        title="Xoá giao dịch">
+                            🆔 {{ gd.id }}
+                    </a>
+
+                    <span class="ngay">📅 {{ gd.ngay }}</span> 
                         {% if gd.loai_giao_dich=='Thu' %} 
                             <span class ="thu"> {{ gd.loai_giao_dich }}
                         {% elif gd.loai_giao_dich=='Chi' %}
@@ -100,26 +120,7 @@
             {% endif %}
 
         </div>
-
-        <div>
-            
-        </div>
     {% endif %}
-</div>
-
-<div class="toolbar">
-    <form action="{{ url_for('index') }}" method="get" style="display:inline;">
-        <input type="hidden" name="loai" value="tblthuchi">
-        <button type="submit" title="Hiển thị giao dịch chi tiết">📊</button>
-    </form>
-
-    <form action="{{ url_for('index') }}" method="get" style="display:inline;">
-        <input type="hidden" name="loai" value="tonghop">
-        <button type="submit" title="Hiển thị tổng hợp giao dịch">🔎</button>
-    </form>
-
-    <button title="Hiển thị dữ liệu 3"></button> <!-- Icon tài liệu -->
-    <button title="Cài đặt">⚙</button> <!-- Icon cài đặt -->
 </div>
 
 {% endblock %}

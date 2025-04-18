@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thêm Giao Dịch - Money Browser</title>
+  <style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 14px; /* nhỏ hơn mặc định */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100dvh;
+        }
+
+        .form-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        max-height: 90vh;
+        overflow-y: auto;
+        }
+
+        h2 {
+        text-align: center;
+        margin-bottom: 1.2rem;
+        color: #333;
+        font-size: 1.4rem; /* nhỏ lại */
+        }
+
+        label {
+        display: block;
+        margin-bottom: 0.3rem;
+        font-weight: 500;
+        color: #4b5563;
+        font-size: 0.95rem; /* nhỏ hơn */
+        }
+
+        input,
+        select,
+        textarea {
+        width: 100%;
+        padding: 0.6rem;
+        margin-bottom: 0.8rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 0.95rem; /* nhỏ hơn */
+        box-sizing: border-box;
+        }
+
+        button {
+        width: 100%;
+        padding: 0.65rem;
+        background: #4f46e5;
+        color: white;
+        border: none;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        cursor: pointer;
+        }
+
+        button:hover {
+        background: #4338ca;
+        }
+
+        .cancel-btn {
+        background: #ccc;
+        color: #333;
+        margin-top: 0.5rem;
+        }
+
+        .cancel-btn:hover {
+        background: #999;
+        }
+
+
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>➕ Thêm Giao Dịch</h2>
+    <form method="POST" action="{{ url_for('them_giao_dich') }}">
+      <label for="ngay">Ngày</label>
+      <input type="date" name="ngay" id="ngay">
+
+      <label for="loai_giao_dich">Loại giao dịch *</label>
+      <select name="loai_giao_dich" id="loai_giao_dich" required>
+        <option value="">-- Chọn loại --</option>
+        <option value="Thu">Thu</option>
+        <option value="Chi">Chi</option>
+        <option value="Chuyển đổi">Chuyển đổi</option>
+      </select>
+
+      <label for="nguon_tien">Nguồn tiền *</label>
+      <select name="nguon_tien" id="nguon_tien" required>
+        {% for nguon in nguon_tien_list %}
+        <option value="{{ nguon.ma_nguon }}">{{ nguon.ten_nguon }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="noi_den">Nơi đến (nếu có)</label>
+      <select name="noi_den" id="noi_den">
+        <option value="">-- Không chọn --</option>
+        {% for noi in nguon_tien_list %}
+        <option value="{{ noi.ma_nguon }}">{{ noi.ten_nguon }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="danh_muc">Danh mục *</label>
+      <select name="danh_muc" id="danh_muc" required>
+        <!-- <option value="">-- Chọn danh mục --</option> -->
+        {% for dm in danh_muc_list %}
+        <option value="{{ dm.ma_danh_muc }}">{{ dm.ten_danh_muc }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="so_tien">Số tiền *</label>
+      <input type="number" name="so_tien" id="so_tien" required step="1000" min="0">
+
+      <label for="ghi_chu">Ghi chú</label>
+      <textarea name="ghi_chu" id="ghi_chu" rows="2" placeholder="Không bắt buộc..."></textarea>
+
+      <button type="submit">💾 Lưu giao dịch</button>
+    </form>
+
+    <form action="{{ url_for('index') }}">
+      <button type="submit" class="cancel-btn">❌ Hủy</button>
+    </form>
+  </div>
+
+</body>
+</html>

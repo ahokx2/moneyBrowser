@@ -11,8 +11,9 @@
     
 </head>
 <body>
-    <div class="logout-btn">🚪 Đăng xuất</div>
-    
-    {% block content %}{% endblock %}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    {% include "toolbar.html" %}
 </body>
 </html>

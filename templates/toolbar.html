@@ -1,0 +1,19 @@
+{% if current_user.is_authenticated %}
+<div style="
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    font-size: 13px;
+    text-align: center;
+    padding: 8px 0;
+    color: #333;
+    z-index: 999;
+    ">
+    <a href="{{ url_for('them_giao_dich') }}" style="text-decoration: none; color: #10b981;">➕ Thêm Giao dịch</a> |
+    <a href="{{ url_for('index') }}" style="text-decoration: none; color: #4b5563;"> ✅ Tổng quan </a>|
+    <a href="{{ url_for('logout') }}" style="text-decoration: none; color: #ef4444;">🔴 Đăng xuất </a>
+  </nav>
+{% endif %}
