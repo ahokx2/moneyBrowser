@@ -81,61 +81,32 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
-# @app.route('/api/data')
-# def api_data():
-#     loai = request.args.get("loai")
-#     today = date.today().strftime('%Y-%m-%d')
-
-#     if loai == 'tblthuchi':
-#         data = tblthuchi.query.order_by(tblthuchi.ngay.desc()).all()
-#         result = [{
-#             "ngay": g.ngay,
-#             "loai_giao_dich": g.loai_giao_dich,
-#             "so_tien": g.so_tien,
-#             "ghi_chu": g.ghi_chu
-#         } for g in data]
-
-#         return jsonify({
-#             "success": True,
-#             "tieu_de": "Danh sách giao dịch chi tiết",
-#             "data": result
-#         })
-
-#     elif loai == 'tonghop':
-#         data = vtonghopgiaodich.query.order_by(vtonghopgiaodich.thang.desc()).all()
-#         result = [{
-#             "thang": i.thang,
-#             "nguon_tien": i.nguon_tien,
-#             "ten_nguon": i.ten_nguon,
-#             "dau_ky": i.dau_ky,
-#             "thu": i.thu,
-#             "chi": i.chi,
-#             "chuyen_doi": i.chuyen_doi,
-#             "cuoi_ky": i.cuoi_ky
-#         } for i in data]
-
-#         return jsonify({
-#             "success": True,
-#             "tieu_de": "Báo cáo tổng hợp theo tháng",
-#             "data": result
-#         })
-
+# @app.route("/them_giao_dich", methods=["POST"])
+# def them_giao_dich():
+#     data = request.form.to_dict()
+#     success = add_giao_dich_moi(data)
+#     if success:
+#         return redirect("/")  # hoặc redirect(url_for('index'))
 #     else:
-#         return jsonify({
-#             "success": False,
-#             "tieu_de": "Lỗi",
-#             "message": "Không xác định được loại yêu cầu",
-#             "data": []
-#     })
+#         return "Lỗi khi thêm giao dịch", 500
 
-@app.route("/them_giao_dich", methods=["POST"])
+@app.route("/them_giao_dich", methods=["GET", "POST"])
+@login_required
 def them_giao_dich():
-    data = request.form.to_dict()
-    success = add_giao_dich_moi(data)
-    if success:
-        return redirect("/")  # hoặc redirect(url_for('index'))
-    else:
-        return "Lỗi khi thêm giao dịch", 500
+    # Lấy dữ liệu nguồn tiền và danh mục từ database
+    nguon_tien_list = tblnguonnoiden.query.all()
+    danh_muc_list = tbldanhmuc.query.all()
+
+    if request.method == "POST":
+        data = request.form.to_dict()
+        success = add_giao_dich_moi(data)
+        if success:
+            flash("Giao dịch đã được thêm thành công!", "success")
+            return redirect("/")
+        else:
+            flash("Lỗi khi thêm giao dịch. Vui lòng thử lại.", "danger")
+    
+    return render_template("them_giao_dich.html", nguon_tien_list=nguon_tien_list, danh_muc_list=danh_muc_list)
 
 @app.route("/xoa_giao_dich/<int:id>")
 def xoa_giao_dich(id):
@@ -143,6 +114,8 @@ def xoa_giao_dich(id):
     db.session.delete(gd)
     db.session.commit()
     return redirect(request.referrer or "/")
+
+
 
 @app.route("/loc_theo_ngay", methods=["GET"])
 def loc_theo_ngay():

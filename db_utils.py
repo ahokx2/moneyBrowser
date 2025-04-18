@@ -57,12 +57,11 @@ def add_giao_dich_moi(data):
             loai_giao_dich=data.get('loai_giao_dich'),
             nguon_tien=data.get('nguon_tien'),
             noi_den=data.get('noi_den'),
-            so_tien=data.get('so_tien'),
+            so_tien=float(data.get('so_tien')),
             ghi_chu=data.get('ghi_chu'),
             danh_muc=data.get('danh_muc')
         )
         db.session.add(giao_dich)
-        print(data)
         db.session.commit()
         return True
     except Exception as e:
