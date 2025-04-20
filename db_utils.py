@@ -1,31 +1,34 @@
-from models import tblthuchi, vtonghopgiaodich, vbieudophantramnguontien, vtichluy
-from datetime import date
+from models import tblthuchi, vtonghopgiaodich, vbieudophantramnguontien, vtichluy, tbldanhmuc, tblnguonnoiden
+from datetime import date, datetime
 from models import db
 
-def get_giao_dich_hom_nay():
-    today = date.today().strftime('%d/%m/%Y')  # format tùy theo bạn lưu
-    return tblthuchi.query.filter_by(ngay=today).all()
+# def get_giao_dich_hom_nay():
+#     today = date.today().strftime('%d/%m/%Y')  # format tùy theo bạn lưu
+#     return tblthuchi.query.filter_by(ngay=today).all()
 
-def get_giao_dich_by_date(date_str):
-    """
-    Lấy giao dịch theo ngày.
-    :param date_str: Ngày theo định dạng 'dd/mm/yyyy'
-    :return: Danh sách giao dịch
-    """
-    return tblthuchi.query.filter_by(ngay=date_str).all()
+# def get_giao_dich_by_date(date_str):
+#     """
+#     Lấy giao dịch theo ngày.
+#     :param date_str: Ngày theo định dạng 'dd/mm/yyyy'
+#     :return: Danh sách giao dịch
+#     """
+#     return tblthuchi.query.filter_by(ngay=date_str).all()
 
-def get_giao_dich_all():
-    return tblthuchi.query.all()
+# def get_giao_dich_thang_hien_tai():
+#     today = date.today()
+#     month = today.strftime('%m/%Y')
+#     return tblthuchi.query.filter(tblthuchi.ngay.like(f'%/{month}')).order_by(tblthuchi.ngay.desc()).all()
 
-def get_giao_dich_thang_hien_tai():
-    today = date.today()
-    month = today.strftime('%m/%Y')
-    return tblthuchi.query.filter(tblthuchi.ngay.like(f'%/{month}')).order_by(tblthuchi.ngay.desc()).all()
+# def get_tong_hop_giao_dich_thang_hien_tai():
+#     today = date.today()
+#     month = today.strftime('%m/%Y')
+#     return vtonghopgiaodich.query.filter_by(thang=month).all()
 
-def get_tong_hop_giao_dich_thang_hien_tai():
-    today = date.today()
-    month = today.strftime('%m/%Y')
-    return vtonghopgiaodich.query.filter_by(thang=month).all()
+def get_danh_muc():
+    return tbldanhmuc.query.all()
+
+def get_nguon_noi_den():
+    return tblnguonnoiden.query.all()
 
 def get_tich_luy_theo_thang(month):
     return vtichluy.query.filter_by(thang=month).all()
@@ -51,9 +54,21 @@ def add_giao_dich_moi(data):
     :param data: dict gồm các field tương ứng với bảng tblthuchi
     :return: True nếu thành công, False nếu lỗi
     """
+
+    ngay_str = data.get('ngay')  # ví dụ: '2025-04-20' từ form <input type="date">
+    try:
+        # Parse kiểu trình duyệt gửi (yyyy-mm-dd)
+        ngay_obj = datetime.strptime(ngay_str, "%Y-%m-%d")
+        # Convert sang chuỗi dd/mm/yyyy
+        ngay_str = ngay_obj.strftime("%d/%m/%Y")
+    except Exception as e:
+        print("Lỗi định dạng ngày:", e)
+        return False
+
     try:
         giao_dich = tblthuchi(
-            ngay=data.get('ngay', date.today().strftime('%d/%m/%Y')),
+            # ngay=data.get('ngay', date.today().strftime('%d/%m/%Y')),
+            ngay = ngay_str,
             loai_giao_dich=data.get('loai_giao_dich'),
             nguon_tien=data.get('nguon_tien'),
             noi_den=data.get('noi_den'),

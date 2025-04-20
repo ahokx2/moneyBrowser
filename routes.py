@@ -1,8 +1,8 @@
 import os
 from flask import Flask, render_template, request, redirect, flash, url_for, jsonify
 from datetime import date
-from db_utils import add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_giao_dich_by_date, get_giao_dich_thang_hien_tai, get_giao_dich_by_date, get_bieu_do_phan_tram_nguon_tien, get_bieu_do_phan_tram_nguon_tien_by_month, get_tich_luy_theo_thang
-from models import db, tblnguonnoiden, tbldanhmuc, tblthuchi, User, vbieudophantramnguontien, vtonghopgiaodich
+from db_utils import get_danh_muc, get_nguon_noi_den, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_bieu_do_phan_tram_nguon_tien_by_month, get_tich_luy_theo_thang
+from models import db, tblthuchi, User, vtonghopgiaodich
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 import unicodedata
 
@@ -15,7 +15,7 @@ db_path = os.path.join(basedir, 'moneyBrowser.db3')  # nếu db nằm ngoài th�
 # app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
 #cái này là external, dùng để dev tại máy cá nhân
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ahokx2:DE2xekSNBsFUCcechR6u84bnnWvPDYkH@dpg-cvui9ommcj7s73ceqjjg-a.oregon-postgres.render.com/moneybrowser_44q3'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ahokx2:DE2xekSNBsFUCcechR6u84bnnWvPDYkH@dpg-cvui9ommcj7s73ceqjjg-a.oregon-postgres.render.com/moneybrowser_44q3'
 
 # cái này là internal, dùng trên render
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ahokx2:DE2xekSNBsFUCcechR6u84bnnWvPDYkH@dpg-cvui9ommcj7s73ceqjjg-a/moneybrowser_44q3'
@@ -94,8 +94,8 @@ def logout():
 @login_required
 def them_giao_dich():
     # Lấy dữ liệu nguồn tiền và danh mục từ database
-    nguon_tien_list = tblnguonnoiden.query.all()
-    danh_muc_list = tbldanhmuc.query.all()
+    nguon_tien_list = get_nguon_noi_den()
+    danh_muc_list = get_danh_muc()
 
     if request.method == "POST":
         data = request.form.to_dict()
@@ -117,19 +117,19 @@ def xoa_giao_dich(id):
 
 
 
-@app.route("/loc_theo_ngay", methods=["GET"])
-def loc_theo_ngay():
-    ngay_loc = request.args.get("ngay_loc")  # yyyy-mm-dd
-    if ngay_loc:
-        # Convert sang dd/mm/yyyy nếu mày lưu vậy trong DB
-        parts = ngay_loc.split("-")
-        formatted = f"{parts[2]}/{parts[1]}/{parts[0]}"
-        giao_dich = get_giao_dich_by_date(formatted)
-    else:
-        giao_dich = []
+# @app.route("/loc_theo_ngay", methods=["GET"])
+# def loc_theo_ngay():
+#     ngay_loc = request.args.get("ngay_loc")  # yyyy-mm-dd
+#     if ngay_loc:
+#         # Convert sang dd/mm/yyyy nếu mày lưu vậy trong DB
+#         parts = ngay_loc.split("-")
+#         formatted = f"{parts[2]}/{parts[1]}/{parts[0]}"
+#         giao_dich = get_giao_dich_by_date(formatted)
+#     else:
+#         giao_dich = []
 
-    return render_template("by_date.html", giao_dich_theo_ngay=giao_dich,
-                           ngay_loc = ngay_loc)
+#     return render_template("by_date.html", giao_dich_theo_ngay=giao_dich,
+#                            ngay_loc = ngay_loc)
     
 @app.route("/", methods = ["GET"])
 @login_required
@@ -144,25 +144,25 @@ def index():
     tieu_de_data2 = ""
     kieu = None  # để điều khiển kiểu hiển thị trong template
 
-    if loai == 'tblthuchi':
-        data = tblthuchi.query.order_by(tblthuchi.ngay.desc()).all()
-        tieu_de = "Danh sách giao dịch chi tiết"
-        kieu = 'chi_tiet'
+    # if loai == 'tblthuchi':
+    #     data = tblthuchi.query.order_by(tblthuchi.ngay.desc()).all()
+    #     tieu_de = "Danh sách giao dịch chi tiết"
+    #     kieu = 'chi_tiet'
 
-    elif loai == 'tonghop':
-        data = vtonghopgiaodich.query.order_by(vtonghopgiaodich.thang.desc()).all()
-        tieu_de = "Báo cáo tổng hợp theo tháng"
-        kieu = 'tong_hop'
+    # elif loai == 'tonghop':
+    #     data = vtonghopgiaodich.query.order_by(vtonghopgiaodich.thang.desc()).all()
+    #     tieu_de = "Báo cáo tổng hợp theo tháng"
+    #     kieu = 'tong_hop'
 
-    else :
-        data = get_5_giao_dich_gan_nhat()
-        data1 = get_bieu_do_phan_tram_nguon_tien_by_month(thang_hien_tai)
-        data2 = get_tich_luy_theo_thang(thang_hien_tai)
-        tieu_de = "Tổng quan tài chính"
-        tieu_de_data = "Danh sách giao dịch gần nhất"
-        tieu_de_data1 = "Phần trăm nguồn tiền"
-        tieu_de_data2 = "Thống kê tích lũy"
-        kieu = 'tong_quan_tai_chinh'
+    
+    data = get_5_giao_dich_gan_nhat()
+    data1 = get_bieu_do_phan_tram_nguon_tien_by_month(thang_hien_tai)
+    data2 = get_tich_luy_theo_thang(thang_hien_tai)
+    tieu_de = "Tổng quan tài chính"
+    tieu_de_data = "Danh sách giao dịch gần nhất"
+    tieu_de_data1 = "Phần trăm nguồn tiền"
+    tieu_de_data2 = "Thống kê tích lũy"
+    kieu = 'tong_quan_tai_chinh'
 
     return render_template('index.html', tieu_de=tieu_de, data=data, data1=data1, data2=data2, kieu=kieu, tieu_de_data=tieu_de_data, tieu_de_data1=tieu_de_data1, tieu_de_data2=tieu_de_data2, thang_hien_tai=thang_hien_tai)
 
