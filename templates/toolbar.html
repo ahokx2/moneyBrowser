@@ -12,8 +12,9 @@
     color: #333;
     z-index: 999;
     ">
-    <a href="{{ url_for('them_giao_dich') }}" style="text-decoration: none; color: #10b981;">➕ Thêm Giao dịch</a> |
-    <a href="{{ url_for('index') }}" style="text-decoration: none; color: #4b5563;"> ✅ Tổng quan </a>|
-    <a href="{{ url_for('logout') }}" style="text-decoration: none; color: #ef4444;">🔴 Đăng xuất </a>
+    <a href="{{ url_for('index') }}" style="text-decoration: none; color: #4b5563;"> 🏠 Home </a>|
+    <a href="{{ url_for('them_giao_dich') }}" style="text-decoration: none; color: #10b981;">➕ Thêm GD</a> |
+    <a href="{{ url_for('tong_quan') }}" style="text-decoration: none; color: #4b5563;"> ✅ Data </a>|
+    <a href="{{ url_for('logout') }}" style="text-decoration: none; color: #ef4444;">🔴 Logout </a>
   </nav>
 {% endif %}

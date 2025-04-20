@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style = "font-size: small;">
+    <h2 style="text-align: center;">
+        {{ tieu_de }} : Tháng
+        <span 
+            onclick="document.getElementById('modal-thang').style.display='flex'"
+            style="cursor: pointer; text-decoration: underline dotted; color: #007bff;"
+            title="Click để đổi tháng">
+            {{ thang_hien_tai }}
+        </span>
+      </h2>
+      <hr>
+      <h3> {{ tieu_de_data1 }}</h3>
+          {% if data1 %}
+              <table border="1" cellpadding="4" cellspacing="0" class ="table_phan_tram_nguon_tien">
+                  <tr style ="font-size: small;">
+                      <th>Nguồn tiền</th>
+                      <th>Đầu kỳ</th>
+                      <th>Thu</th>
+                      <th>Chi</th>
+                      <th>Chuyển đổi</th>
+                      <th>Cuối kỳ</th>
+                  </tr>
+                  {% for row in data1 %}
+                  <tr>
+                      <td style="font-size: x-small;">{{ row.ten_nguon }}</td>
+                      <td style="text-align: right; font-size: x-small;">{{ "{:,.0f}".format(row.dau_ky) }}</td>
+                      <td style="text-align: right; font-size: x-small;">{{ "{:,.0f}".format(row.thu) }}</td>
+                      <td style="text-align: right; font-size: x-small;">{{ "{:,.0f}".format(row.chi) }}</td>
+                      <td style="text-align: right; font-size: x-small;">{{ "{:,.0f}".format(row.chuyen_doi) }}</td>
+                      <td style="text-align: right; font-size: x-small;">{{ "{:,.0f}".format(row.cuoi_ky) }}</td>
+                  </tr>
+                  {% endfor %}
+              </table>
+              
+          {% else %}
+              <p>Không có dữ liệu giao dịch.</p>
+          {% endif %}
+    <hr>
+    <h3>{{ tieu_de_data }}</h3> 
+        {% if data %}
+        {% for gd in data %}
+            <div class="giao-dich {{ gd.loai_giao_dich|slugify }}">
+                <a href="{{ url_for('xoa_giao_dich', id=gd.id) }}"
+                    onclick="return confirm('Bạn có chắc muốn xoá giao dịch {{ gd.id }}?')"
+                    style="color: #888; text-decoration: none; font-size: 12px;"
+                    title="Xoá giao dịch">
+                        🆔 {{ gd.id }}
+                </a>
+
+                <span class="ngay">📅 {{ gd.ngay }}</span> 
+                    {% if gd.loai_giao_dich=='Thu' %} 
+                        <span class ="thu"> {{ gd.loai_giao_dich }}
+                    {% elif gd.loai_giao_dich=='Chi' %}
+                        <span class ="chi"> {{ gd.loai_giao_dich }}
+                    {% else %}
+                        <span class ="chuyendoi"> {{ gd.loai_giao_dich }}
+                    {% endif %}
+                </span> : {{ gd.nguon_tien_obj.ten_nguon }} ➡️ {{ gd.noi_den_obj.ten_nguon }}
+                <span class="so-tien">{{ "{:,.0f}".format(gd.so_tien) }}₫</span>
+                <span class="ghichu">{{ gd.ghi_chu or 'Không ghi chú' }}</span>
+            </div>
+        {% endfor %}
+        {% else %}
+            <p>Không có dữ liệu giao dịch.</p>
+        {% endif %}
+</div>
+
+<!-- Modal chọn tháng -->
+<div id="modal-thang" class="modal-overlay">
+    <div class="modal-box">
+      <h3>Nhập tháng xem dữ liệu</h3>
+      <form method="get" action="{{ url_for('tong_quan') }}">
+        <input type="text" id="thang" name="thang" placeholder="VD: 04/2025" value="{{ thang_hien_tai }}" required>
+        <div class="btn-group">
+          <button type="submit" class="btn-submit">Xem</button>
+          <button type="button" class="btn-cancel" onclick="document.getElementById('modal-thang').style.display='none'">Huỷ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
