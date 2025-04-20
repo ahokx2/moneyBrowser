@@ -14,10 +14,10 @@ from models import db
 #     """
 #     return tblthuchi.query.filter_by(ngay=date_str).all()
 
-# def get_giao_dich_thang_hien_tai():
-#     today = date.today()
-#     month = today.strftime('%m/%Y')
-#     return tblthuchi.query.filter(tblthuchi.ngay.like(f'%/{month}')).order_by(tblthuchi.ngay.desc()).all()
+def get_giao_dich_theo_thang(month):
+    # today = date.today()
+    # month = today.strftime('%m/%Y')
+    return tblthuchi.query.filter(tblthuchi.ngay.like(f'%/{month}')).order_by(tblthuchi.ngay.desc()).all()
 
 # def get_tong_hop_giao_dich_thang_hien_tai():
 #     today = date.today()
@@ -33,13 +33,13 @@ def get_nguon_noi_den():
 def get_tich_luy_theo_thang(month):
     return vtichluy.query.filter_by(thang=month).all()
 
-def get_tong_hop_giao_dich_by_month(month):
+def get_tong_hop_giao_dich_theo_thang(month):
     return vtonghopgiaodich.query.filter_by(thang=month).all()
 
 def get_bieu_do_phan_tram_nguon_tien(): #bieu_do_phan_tram_nguon_tien dùng để lấy dữ liệu cho biểu đồ
     return vbieudophantramnguontien.query.all()
 
-def get_bieu_do_phan_tram_nguon_tien_by_month(month):   #bieu_do_phan_tram_nguon_tien dùng để lấy dữ liệu cho biểu đồ theo thang
+def get_bieu_do_phan_tram_nguon_tien_theo_thang(month):   #bieu_do_phan_tram_nguon_tien dùng để lấy dữ liệu cho biểu đồ theo thang
     return vbieudophantramnguontien.query.filter_by(thang=month).all()
 
 def get_tong_hop_giao_dich_all():

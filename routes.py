@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, flash, url_for, jsonify
-from datetime import date
-from db_utils import get_danh_muc, get_nguon_noi_den, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_bieu_do_phan_tram_nguon_tien_by_month, get_tich_luy_theo_thang
+from datetime import date, datetime
+from db_utils import get_danh_muc, get_nguon_noi_den, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_tich_luy_theo_thang, get_giao_dich_theo_thang, get_bieu_do_phan_tram_nguon_tien_theo_thang, get_tong_hop_giao_dich_theo_thang
 from models import db, tblthuchi, User, vtonghopgiaodich
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 import unicodedata
@@ -115,8 +115,6 @@ def xoa_giao_dich(id):
     db.session.commit()
     return redirect(request.referrer or "/")
 
-
-
 # @app.route("/loc_theo_ngay", methods=["GET"])
 # def loc_theo_ngay():
 #     ngay_loc = request.args.get("ngay_loc")  # yyyy-mm-dd
@@ -130,6 +128,18 @@ def xoa_giao_dich(id):
 
 #     return render_template("by_date.html", giao_dich_theo_ngay=giao_dich,
 #                            ngay_loc = ngay_loc)
+
+@app.route("/tong_quan")
+@login_required
+def tong_quan():
+    thang = request.args.get("thang") or datetime.now().strftime("%m/%Y")
+    tieu_de = "Cơ sở dữ liệu"
+    tieu_de_data = "Toàn bộ giao dịch"
+    data = get_giao_dich_theo_thang(thang)
+    tieu_de_data1 = "Giao dịch theo nguồn tiền"
+    data1 = get_tong_hop_giao_dich_theo_thang(thang)
+
+    return render_template("tong_quan.html", tieu_de=tieu_de, thang_hien_tai=thang, tieu_de_data=tieu_de_data, data=data, tieu_de_data1=tieu_de_data1, data1=data1)
     
 @app.route("/", methods = ["GET"])
 @login_required
@@ -156,7 +166,7 @@ def index():
 
     
     data = get_5_giao_dich_gan_nhat()
-    data1 = get_bieu_do_phan_tram_nguon_tien_by_month(thang_hien_tai)
+    data1 = get_bieu_do_phan_tram_nguon_tien_theo_thang(thang_hien_tai)
     data2 = get_tich_luy_theo_thang(thang_hien_tai)
     tieu_de = "Tổng quan tài chính"
     tieu_de_data = "Danh sách giao dịch gần nhất"
