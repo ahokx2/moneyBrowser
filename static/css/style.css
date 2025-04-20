@@ -2,10 +2,11 @@
 /* @import url('https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&display=swap'); */
 /* @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap'); */
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+
 body {
   margin: 0;
-  font-family: "Fira Code", monospace;
-  font-weight: 400;
+  font-family: 'Source Code Pro', monospace;
+  font-weight: 14px;
   background-color: #ffffff;
   color: #000000;
   padding-bottom: 60px; /* Đảm bảo nội dung không bị che bởi toolbar */
