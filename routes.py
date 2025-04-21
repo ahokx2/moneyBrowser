@@ -1,10 +1,11 @@
 import os
 from flask import Flask, render_template, request, redirect, flash, url_for, jsonify
 from datetime import date, datetime
-from db_utils import get_danh_muc, get_nguon_noi_den, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_tich_luy_theo_thang, get_giao_dich_theo_thang, get_bieu_do_phan_tram_nguon_tien_theo_thang, get_tong_hop_giao_dich_theo_thang
+from db_utils import get_danh_muc, get_nguon_noi_den, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_tich_luy_theo_thang, get_giao_dich_theo_thang, get_bieu_do_phan_tram_nguon_tien_theo_thang, get_tong_hop_giao_dich_theo_thang, get_so_du_dau_ky_theo_thang, tinh_cuoi_ky
 from models import db, tblthuchi, User, vtonghopgiaodich
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 import unicodedata
+
 
 app = Flask(__name__)
 
@@ -136,11 +137,20 @@ def tong_quan():
     tieu_de = "Cơ sở dữ liệu"
     tieu_de_data = "Toàn bộ giao dịch"
     data = get_giao_dich_theo_thang(thang)
-    tieu_de_data1 = "Giao dịch theo nguồn tiền"
-    data1 = get_tong_hop_giao_dich_theo_thang(thang)
-
+    tieu_de_data1 = "Bảng đầu/cuối kỳ"
+    data1 = get_so_du_dau_ky_theo_thang(thang)
     return render_template("tong_quan.html", tieu_de=tieu_de, thang_hien_tai=thang, tieu_de_data=tieu_de_data, data=data, tieu_de_data1=tieu_de_data1, data1=data1)
-    
+
+@app.route("/tinh_so_du_cuoi_ky", methods=["GET"])
+@login_required
+def tinh_so_du_cuoi_ky():
+    thang = request.args.get("thang")
+    if not thang:
+        return "Thiếu tham số tháng", 400
+
+    tinh_cuoi_ky(thang)
+    return redirect(url_for("tong_quan", thang=thang))
+
 @app.route("/", methods = ["GET"])
 @login_required
 def index():    

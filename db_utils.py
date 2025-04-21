@@ -1,6 +1,7 @@
-from models import tblthuchi, vtonghopgiaodich, vbieudophantramnguontien, vtichluy, tbldanhmuc, tblnguonnoiden
+from models import tblthuchi, vtonghopgiaodich, vbieudophantramnguontien, vtichluy, tbldanhmuc, tblnguonnoiden, tblsodudauky
 from datetime import date, datetime
 from models import db
+from sqlalchemy import text
 
 # def get_giao_dich_hom_nay():
 #     today = date.today().strftime('%d/%m/%Y')  # format tùy theo bạn lưu
@@ -27,6 +28,9 @@ def get_giao_dich_theo_thang(month):
 def get_danh_muc():
     return tbldanhmuc.query.all()
 
+def get_so_du_dau_ky_theo_thang(month):
+    return tblsodudauky.query.filter_by(thang=month).all()
+
 def get_nguon_noi_den():
     return tblnguonnoiden.query.all()
 
@@ -47,6 +51,46 @@ def get_tong_hop_giao_dich_all():
 
 def get_5_giao_dich_gan_nhat():
     return tblthuchi.query.order_by(tblthuchi.id.desc()).limit(5).all()
+
+def tinh_cuoi_ky(thang):
+    """
+    Cập nhật số dư cuối kỳ cho tháng `thang` và tạo số dư đầu kỳ cho tháng tiếp theo nếu chưa có.
+    """
+    # Bước 1: Update cuoi_ky từ vtonghopgiaodich
+    update_sql = text("""
+        UPDATE tblsodudauky
+        SET cuoi_ky = (
+            SELECT cuoi_ky
+            FROM vtonghopgiaodich AS v
+            WHERE v.thang = tblsodudauky.thang AND v.nguon_tien = tblsodudauky.ma_nguon
+        )
+        WHERE thang = :thang
+    """)
+    db.session.execute(update_sql, {"thang": thang})
+
+    # Bước 2: Tính tháng kế tiếp
+    thang_date = datetime.strptime(thang, "%m/%Y")
+    if thang_date.month == 12:
+        next_month = datetime(thang_date.year + 1, 1, 1)
+    else:
+        next_month = datetime(thang_date.year, thang_date.month + 1, 1)
+    thang_tiep_theo = next_month.strftime("%m/%Y")
+
+    # Bước 3: Tạo dòng mới cho tháng sau nếu chưa có
+    insert_sql = text("""
+        INSERT INTO tblsodudauky (thang, ma_nguon, so_tien)
+        SELECT :next_month, ma_nguon, cuoi_ky
+        FROM tblsodudauky
+        WHERE thang = :current_month
+        ON CONFLICT (thang, ma_nguon) DO UPDATE
+        SET so_tien = EXCLUDED.so_tien
+    """)
+    db.session.execute(insert_sql, {
+        "current_month": thang,
+        "next_month": thang_tiep_theo
+    })
+
+    db.session.commit()
 
 def add_giao_dich_moi(data):
     """

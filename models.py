@@ -23,6 +23,16 @@ class tblthuchi(db.Model):
     nguon_tien_obj = db.relationship('tblnguonnoiden', backref='nguon_tien', lazy=True, foreign_keys=[nguon_tien])
     noi_den_obj = db.relationship('tblnguonnoiden', backref='noi_den', lazy=True, foreign_keys=[noi_den])
 
+class tblsodudauky(db.Model):
+    __tablename__ = 'tblsodudauky'
+    id = db.Column(db.Integer, primary_key=True)
+    thang = db.Column(db.String(100), nullable=True)
+    ma_nguon = db.Column(db.String(100),db.ForeignKey('tblnguonnoiden.ma_nguon') , nullable=True)
+    so_tien = db.Column(db.Float, nullable=True)
+    cuoi_ky = db.Column(db.Float, nullable=True)
+
+    ma_nguon_obj = db.relationship('tblnguonnoiden', backref='ma_nguon_tien', lazy=True, foreign_keys = [ma_nguon])
+
 
 
 class tbldanhmuc(db.Model):
