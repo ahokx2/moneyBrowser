@@ -11,35 +11,38 @@
             {{ thang_hien_tai }}
         </span>
       </h2>
-      <hr>
-      <h3> {{ tieu_de_data1 }}</h3>
-          {% if data1 %}
-              <table border="1" cellpadding="4" cellspacing="0" class ="table_phan_tram_nguon_tien">
-                  <tr style ="font-size: small;">
-                      <th>Nguồn tiền</th>
-                      <th>Đầu kỳ</th>
-                      <th>Thu</th>
-                      <th>Chi</th>
-                      <th>Chuyển đổi</th>
-                      <th>Cuối kỳ</th>
-                  </tr>
-                  {% for row in data1 %}
-                  <tr>
-                      <td style="font-size: x-small;">{{ row.ten_nguon }}</td>
-                      <td style="text-align: right; font-size: x-small;">{{ "{:,.0f}".format(row.dau_ky) }}</td>
-                      <td style="text-align: right; font-size: x-small;">{{ "{:,.0f}".format(row.thu) }}</td>
-                      <td style="text-align: right; font-size: x-small;">{{ "{:,.0f}".format(row.chi) }}</td>
-                      <td style="text-align: right; font-size: x-small;">{{ "{:,.0f}".format(row.chuyen_doi) }}</td>
-                      <td style="text-align: right; font-size: x-small;">{{ "{:,.0f}".format(row.cuoi_ky) }}</td>
-                  </tr>
-                  {% endfor %}
-              </table>
-              
-          {% else %}
-              <p>Không có dữ liệu giao dịch.</p>
-          {% endif %}
     <hr>
-    <h3>{{ tieu_de_data }}</h3> 
+    <h3>{{ tieu_de_data1 }}</h3>
+    {% if data1 %}
+            <table border="1" cellpadding="4" cellspacing="0" class ="table_phan_tram_nguon_tien">
+                <tr>
+                    <th>Nguồn tiền</th>
+                    <th>Đầu kỳ</th>
+                    <th>Cuối kỳ</th>
+                </tr>
+                {% for row in data1 %}
+                <tr>
+                    <td>{{ row.ma_nguon_obj.ten_nguon }}</td>
+                    <td style="text-align: right;">{{ "{:,.0f}".format(row.so_tien) }}</td>
+                    {% if row.cuoi_ky %}
+                        <td style="text-align: right;">{{ "{:,.0f}".format(row.cuoi_ky) }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Không có dữ liệu giao dịch.</p>
+        {% endif %}
+    <br>
+    <a href="{{ url_for('tinh_so_du_cuoi_ky', thang=thang_hien_tai) }}"
+   onclick="return confirm('Bạn có chắc muốn tính cuối kỳ cho tháng {{ thang_hien_tai }}? Dữ liệu đầu kỳ tháng sau sẽ bị cập nhật lại.')"
+   style="text-decoration: none; color: #4b5563;">
+   🏠 Tính cuối kỳ
+</a>
+    <hr>
+    <h3>{{ tieu_de_data }}</h3>
         {% if data %}
         {% for gd in data %}
             <div class="giao-dich {{ gd.loai_giao_dich|slugify }}">
