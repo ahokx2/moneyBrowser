@@ -1,4 +1,4 @@
-from models import tblthuchi, vtonghopgiaodich, vbieudophantramnguontien, vtichluy, tbldanhmuc, tblnguonnoiden, tblsodudauky
+from models import tblthuchi, vtonghopgiaodich, vbieudophantramnguontien, vtichluy, tbldanhmuc, tblnguonnoiden, tblsodudauky, variable
 from datetime import date, datetime
 from models import db
 from sqlalchemy import text
@@ -52,6 +52,15 @@ def get_tong_hop_giao_dich_all():
 def get_5_giao_dich_gan_nhat():
     return tblthuchi.query.order_by(tblthuchi.id.desc()).limit(5).all()
 
+def get_variable(ten_bien):
+    """
+    Lấy giá trị của biến từ bảng variable.
+    :param ten_bien: Tên biến cần lấy giá trị
+    :return: Giá trị của biến hoặc None nếu không tìm thấy
+    """
+    bien = variable.query.filter_by(ten_bien=ten_bien).first()
+    return bien.gia_tri if bien else None
+
 def tinh_cuoi_ky(thang):
     """
     Cập nhật số dư cuối kỳ cho tháng `thang` và tạo số dư đầu kỳ cho tháng tiếp theo nếu chưa có.
@@ -91,6 +100,28 @@ def tinh_cuoi_ky(thang):
     })
 
     db.session.commit()
+    update_variable("tinh_so_du", 1)
+
+def update_variable(ten_bien, gia_tri):
+    """
+    Cập nhật giá trị của biến trong bảng variable.
+    :param ten_bien: Tên biến cần cập nhật
+    :param gia_tri: Giá trị mới
+    :return: True nếu thành công, False nếu lỗi
+    """
+    try:
+        bien = variable.query.filter_by(ten_bien=ten_bien).first()
+        if bien:
+            bien.gia_tri = gia_tri
+            db.session.commit()
+            return True
+        else:
+            print(f"Biến {ten_bien} không tồn tại.")
+            return False
+    except Exception as e:
+        print("Lỗi khi cập nhật biến:", e)
+        db.session.rollback()
+        return False
 
 def add_giao_dich_moi(data):
     """

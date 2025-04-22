@@ -40,6 +40,7 @@ class tbldanhmuc(db.Model):
     ma_danh_muc = db.Column(db.String(100), nullable=True, primary_key=True)
     ten_danh_muc = db.Column(db.String(100), nullable=True)  # 'thu' hoặc 'chi'
 
+
 class tblnguonnoiden(db.Model):
     __tablename__ = 'tblnguonnoiden'
     ma_nguon = db.Column(db.String(100), nullable=True, primary_key=True)
@@ -73,6 +74,14 @@ class vtichluy(db.Model):
     chi = db.Column(db.Float, primary_key=True)
     tich_luy = db.Column(db.Float, primary_key=True)
     phan_tram_tich_luy = db.Column(db.Float, primary_key=True)
+
+class variable(db.Model):
+    __tablename__ = 'variable'
+    id = db.Column( db.Integer, nullable=False, primary_key=True)
+    ten_bien = db.Column(db.String(100), nullable=True)
+    gia_tri = db.Column( db.Integer, nullable=False)
+    ghi_chu = db.Column(db.String(100), nullable=True)
+
 
 class User(UserMixin, db.Model):  # ✅ kế thừa UserMixin
     __tablename__ = 'users'

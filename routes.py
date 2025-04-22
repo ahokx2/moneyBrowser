@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, flash, url_for, jsonify
 from datetime import date, datetime
-from db_utils import get_danh_muc, get_nguon_noi_den, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_tich_luy_theo_thang, get_giao_dich_theo_thang, get_bieu_do_phan_tram_nguon_tien_theo_thang, get_tong_hop_giao_dich_theo_thang, get_so_du_dau_ky_theo_thang, tinh_cuoi_ky
+from db_utils import get_danh_muc, get_nguon_noi_den, add_giao_dich_moi, get_5_giao_dich_gan_nhat, get_tich_luy_theo_thang, get_giao_dich_theo_thang, get_bieu_do_phan_tram_nguon_tien_theo_thang, get_tong_hop_giao_dich_theo_thang, get_so_du_dau_ky_theo_thang, tinh_cuoi_ky, get_variable, update_variable
 from models import db, tblthuchi, User, vtonghopgiaodich
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 import unicodedata
@@ -9,9 +9,9 @@ import unicodedata
 
 app = Flask(__name__)
 
-# ✅ Xác định đường dẫn tuyệt đối đến file DB
-basedir = os.path.abspath(os.path.dirname(__file__))
-db_path = os.path.join(basedir, 'moneyBrowser.db3')  # nếu db nằm ngoài thư mục chứa routes.py
+# # ✅ Xác định đường dẫn tuyệt đối đến file DB
+# basedir = os.path.abspath(os.path.dirname(__file__))
+# db_path = os.path.join(basedir, 'moneyBrowser.db3')  # nếu db nằm ngoài thư mục chứa routes.py
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
@@ -103,6 +103,7 @@ def them_giao_dich():
         success = add_giao_dich_moi(data)
         if success:
             flash("Giao dịch đã được thêm thành công!", "success")
+            update_variable("tinh_so_du", 0)
             return redirect("/")
         else:
             flash("Lỗi khi thêm giao dịch. Vui lòng thử lại.", "danger")
@@ -114,6 +115,7 @@ def xoa_giao_dich(id):
     gd = tblthuchi.query.get_or_404(id)
     db.session.delete(gd)
     db.session.commit()
+    update_variable("tinh_so_du", 0)
     return redirect(request.referrer or "/")
 
 # @app.route("/loc_theo_ngay", methods=["GET"])
@@ -139,7 +141,8 @@ def tong_quan():
     data = get_giao_dich_theo_thang(thang)
     tieu_de_data1 = "Bảng đầu/cuối kỳ"
     data1 = get_so_du_dau_ky_theo_thang(thang)
-    return render_template("tong_quan.html", tieu_de=tieu_de, thang_hien_tai=thang, tieu_de_data=tieu_de_data, data=data, tieu_de_data1=tieu_de_data1, data1=data1)
+    da_tinh_cuoi_ky = get_variable("tinh_so_du")
+    return render_template("tong_quan.html", tieu_de=tieu_de, thang_hien_tai=thang, tieu_de_data=tieu_de_data, data=data, tieu_de_data1=tieu_de_data1, data1=data1, da_tinh_cuoi_ky=da_tinh_cuoi_ky)
 
 @app.route("/tinh_so_du_cuoi_ky", methods=["GET"])
 @login_required
@@ -162,6 +165,7 @@ def index():
     tieu_de_data = ""
     tieu_de_data1 = ""
     tieu_de_data2 = ""
+    da_tinh_cuoi_ky = get_variable("tinh_so_du")
     kieu = None  # để điều khiển kiểu hiển thị trong template
 
     # if loai == 'tblthuchi':
@@ -184,7 +188,7 @@ def index():
     tieu_de_data2 = "Thống kê tích lũy"
     kieu = 'tong_quan_tai_chinh'
 
-    return render_template('index.html', tieu_de=tieu_de, data=data, data1=data1, data2=data2, kieu=kieu, tieu_de_data=tieu_de_data, tieu_de_data1=tieu_de_data1, tieu_de_data2=tieu_de_data2, thang_hien_tai=thang_hien_tai)
+    return render_template('index.html', tieu_de=tieu_de, data=data, data1=data1, data2=data2, kieu=kieu, tieu_de_data=tieu_de_data, tieu_de_data1=tieu_de_data1, tieu_de_data2=tieu_de_data2, thang_hien_tai=thang_hien_tai, da_tinh_cuoi_ky=da_tinh_cuoi_ky)
 
 if __name__ == "__main__":
     app.run(debug=True)
