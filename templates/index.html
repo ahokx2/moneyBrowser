@@ -3,7 +3,9 @@
 {% block content %}
 
 <div class="container">
-    <h2 style="text-align: center;">{{ tieu_de }} tháng : {{ thang_hien_tai }}</h2>
+    <h2 style="text-align: center;">{{ tieu_de }} tháng : {{ thang_hien_tai }} {% if da_tinh_cuoi_ky == 0 %}
+        <span style="color: red; font-style: italic;"> * chưa tính cuối kỳ</span>
+      {% endif %}</h2>
     <hr>
     <div class="container">
         <!-- Tổng hợp tỷ lệ nguồn tiền -->

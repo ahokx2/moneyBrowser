@@ -12,7 +12,9 @@
         </span>
       </h2>
     <hr>
-    <h3>{{ tieu_de_data1 }}</h3>
+    <h3>{{ tieu_de_data1 }} {% if da_tinh_cuoi_ky == 0 %}
+        <span style="color: red; font-style: italic;">( * chưa tính cuối kỳ)</span>
+      {% endif %}</h3>
     {% if data1 %}
             <table border="1" cellpadding="4" cellspacing="0" class ="table_phan_tram_nguon_tien">
                 <tr>
@@ -37,10 +39,9 @@
         {% endif %}
     <br>
     <a href="{{ url_for('tinh_so_du_cuoi_ky', thang=thang_hien_tai) }}"
-   onclick="return confirm('Bạn có chắc muốn tính cuối kỳ cho tháng {{ thang_hien_tai }}? Dữ liệu đầu kỳ tháng sau sẽ bị cập nhật lại.')"
-   style="text-decoration: none; color: #4b5563;">
-   🏠 Tính cuối kỳ
-</a>
+        onclick="return confirm('Bạn có chắc muốn tính cuối kỳ cho tháng {{ thang_hien_tai }}? Dữ liệu đầu kỳ tháng sau sẽ bị cập nhật lại.')"
+        style="text-decoration: none; color: #4b5563;">
+        🏠 Tính cuối kỳ</a>
     <hr>
     <h3>{{ tieu_de_data }}</h3>
         {% if data %}
