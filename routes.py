@@ -166,6 +166,7 @@ def index():
     tieu_de_data1 = ""
     tieu_de_data2 = ""
     da_tinh_cuoi_ky = get_variable("tinh_so_du")
+    thang = datetime.now().strftime("%m/%Y")
     kieu = None  # để điều khiển kiểu hiển thị trong template
 
     # if loai == 'tblthuchi':
@@ -188,7 +189,7 @@ def index():
     tieu_de_data2 = "Thống kê tích lũy"
     kieu = 'tong_quan_tai_chinh'
 
-    return render_template('index.html', tieu_de=tieu_de, data=data, data1=data1, data2=data2, kieu=kieu, tieu_de_data=tieu_de_data, tieu_de_data1=tieu_de_data1, tieu_de_data2=tieu_de_data2, thang_hien_tai=thang_hien_tai, da_tinh_cuoi_ky=da_tinh_cuoi_ky)
+    return render_template('index.html', tieu_de=tieu_de, data=data, data1=data1, data2=data2, kieu=kieu, tieu_de_data=tieu_de_data, tieu_de_data1=tieu_de_data1, tieu_de_data2=tieu_de_data2, thang_hien_tai=thang, da_tinh_cuoi_ky=da_tinh_cuoi_ky)
 
 if __name__ == "__main__":
     app.run(debug=True)
